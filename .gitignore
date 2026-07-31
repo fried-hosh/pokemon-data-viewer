@@ -35,3 +35,6 @@ skills-lock.json
 /learning-records/
 /lessons/
 /reference/
+
+# CodeGraph index
+/.codegraph/

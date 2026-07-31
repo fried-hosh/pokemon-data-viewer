@@ -1,17 +1,23 @@
 import { PokemonOverviewList } from "../components/PokemonOverviewList.js";
 import { usePokemonOverview } from "../hooks/usePokemonOverview.js";
+import { useOutletContext } from "react-router-dom";
 
+export type PokemonSearchContext = {
+  pokemonName: string | null;
+};
 const PokemonOverviewPage = () => {
-  const pokemonInfo = usePokemonOverview("ロトム");
+  const { pokemonName } = useOutletContext<PokemonSearchContext>();
+  const pokemonInfo = usePokemonOverview(pokemonName);
 
-  if (pokemonInfo.isPending) {
-    return <p>読み込み中...</p>;
-  }
+  return (
+    <div>
+      {pokemonName !== null && pokemonInfo.isLoading && <p>読み込み中...</p>}
 
-  if (pokemonInfo.isError) {
-    return <p className="text-red-200">取得に失敗しました</p>;
-  }
-  return <PokemonOverviewList items={pokemonInfo.data} />;
+      {pokemonName !== null && pokemonInfo.isError && <p className="text-red-200">取得に失敗しました</p>}
+
+      {pokemonName !== null && pokemonInfo.isSuccess && <PokemonOverviewList items={pokemonInfo.data} />}
+    </div>
+  );
 };
 
 export default PokemonOverviewPage;
