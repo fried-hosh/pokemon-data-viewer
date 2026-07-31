@@ -1,4 +1,4 @@
-const PokemonDetailList = ({ items }) => {
+const PokemonDetailList = () => {
   return <p></p>;
 };
 
