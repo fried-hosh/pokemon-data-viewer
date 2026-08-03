@@ -1,12 +1,11 @@
 import { z } from "zod";
 import { toPokemonApiName } from "../lib/pokemonNameMap.js";
 import { type PokemonType } from "../lib/pokemonTypeMap.js";
+import { PokemonTypeSchema } from "../lib/pokemonTypeMap.js";
 
 /* ========================================
    スキーマ
 ======================================== */
-
-const PokemonTypeSchema = z.enum(["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"]);
 
 const SpeciesSchema = z.object({
   varieties: z.array(
