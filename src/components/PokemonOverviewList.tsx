@@ -20,7 +20,7 @@ export const PokemonOverviewList = ({ items }: Props) => {
 
           <p>
             タイプ：
-            <span className="font-bold text-slate-700">
+            <span className="inline-flex gap-1 font-bold ">
               {pokemon.types.map((type) => {
                 const typeInfo = pokemonTypeMap[type];
 

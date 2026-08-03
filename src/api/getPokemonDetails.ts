@@ -3,6 +3,8 @@
 // タイプ相性
 // 覚える技
 import { z } from "zod";
+import { type PokemonType } from "../lib/pokemonTypeMap";
+import { PokemonTypeSchema } from "../lib/pokemonTypeMap";
 
 /* ========================================
    スキーマ
@@ -33,7 +35,7 @@ const PokemonSchema = z.object({
     z.object({
       slot: z.number(),
       type: z.object({
-        name: z.string(),
+        name: PokemonTypeSchema,
         url: z.string(),
       }),
     }),
@@ -107,7 +109,7 @@ export type PokemonDetails = {
   id: number;
   name: string;
   imageUrl: string | null;
-  types: string[];
+  types: PokemonType[];
   stats: { name: string; baseStat: number }[];
   abilities: { name: string; isHidden: boolean }[];
   evolutions: EvolutionItem[];

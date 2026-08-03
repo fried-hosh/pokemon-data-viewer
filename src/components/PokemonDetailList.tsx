@@ -1,4 +1,5 @@
 import { type PokemonDetails } from "../api/getPokemonDetails";
+import { pokemonTypeMap } from "../lib/pokemonTypeMap";
 
 type Props = {
   details: PokemonDetails;
@@ -24,10 +25,15 @@ const PokemonDetailList = ({ details }: Props) => {
           {details.imageUrl !== null && <img className="mx-auto w-full max-w-3xs" src={details.imageUrl} alt={details.name} />}
           <div>
             <h2>{details.name}</h2>
-            <ul className="flex gap-2">
-              {details.types.map((type) => (
-                <li key={type}>{type}</li>
-              ))}
+            <ul className="flex gap-1 font-bold">
+              {details.types.map((type) => {
+                const typeInfo = pokemonTypeMap[type];
+                return (
+                  <li key={type} className={`${typeInfo.bgColorClass} rounded px-2 py-1 text-white`}>
+                    {typeInfo.ja}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>
