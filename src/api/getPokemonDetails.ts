@@ -53,6 +53,19 @@ const PokemonSchema = z.object({
   }),
 });
 
+const AbilitySchema = z.object({
+  flavor_text_entries: z.array(
+    z.object({
+      flavor_text: z.string(),
+      language: z.object({
+        name: z.string(),
+      }),
+    }),
+  ),
+});
+
+const AbilityArraySchema = z.array(AbilitySchema);
+
 const SpeciesSchema = z.object({
   evolution_chain: z.object({
     url: z.string(),
@@ -111,7 +124,7 @@ export type PokemonDetails = {
   imageUrl: string | null;
   types: PokemonType[];
   stats: { name: string; baseStat: number }[];
-  abilities: { name: string; isHidden: boolean }[];
+  abilities: { name: string; isHidden: boolean; description: string | null }[];
   evolutions: EvolutionItem[];
 };
 
@@ -137,7 +150,26 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
 
   const pokemonData = pokemonResult.data;
 
-  console.log(pokemonData);
+  // 特性の説明文
+  const abilityDescriptionUrls = pokemonData.abilities.map((ability) => ability.ability.url);
+  const abilityDescriptionResponses = await Promise.all(abilityDescriptionUrls.map((url) => fetch(url)));
+
+  for (const res of abilityDescriptionResponses) {
+    if (!res.ok) {
+      throw new Error(`abilityDescriptionの取得失敗: ${res.status}`);
+    }
+  }
+
+  const rawAbilityDescriptions: unknown = await Promise.all(abilityDescriptionResponses.map((res) => res.json()));
+
+  const abilityResult = AbilityArraySchema.safeParse(rawAbilityDescriptions);
+
+  if (!abilityResult.success) {
+    console.error(abilityResult.error);
+    throw new Error("abilityレスポンスの形式が想定と異なります");
+  }
+
+  const abilityDescriptionsData = abilityResult.data;
 
   // species
   const speciesRes = await fetch(pokemonData.species.url);
@@ -155,8 +187,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   }
 
   const speciesData = speciesResult.data;
-
-  console.log(speciesData);
 
   // 進化チェーン
   const evolutionChainRes = await fetch(speciesData.evolution_chain.url);
@@ -176,12 +206,9 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
 
   const evolutionData = evolutionChainResult.data;
 
-  console.log(evolutionData);
-
   /* ========================================
    データ整形
 ======================================== */
-  //
 
   // 進化チェーンから全ポケモン名を再帰取得
   const getEvolutionItems = (node: EvolutionNode): EvolutionItem[] => {
@@ -215,10 +242,22 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     baseStat: stat.base_stat,
   }));
 
-  const abilities = pokemonData.abilities.map((ability) => ({
-    name: ability.ability.name,
-    isHidden: ability.is_hidden,
-  }));
+  // 特性の名前と説明文をインデックスで対応させる
+  const descriptions = abilityDescriptionsData.map((abilityData) => {
+    const description = abilityData.flavor_text_entries.filter((entry) => entry.language.name === "ja").at(-1)?.flavor_text ?? null;
+    // 1.日本語説明が見つからない場合のnull
+    return description;
+  });
+
+  const abilities = pokemonData.abilities.map((ability, index) => {
+    // 2.指定したインデックスに要素がない場合のnull
+    const description = descriptions[index] ?? null;
+    return {
+      name: ability.ability.name,
+      isHidden: ability.is_hidden,
+      description,
+    };
+  });
 
   return {
     id: pokemonData.id,

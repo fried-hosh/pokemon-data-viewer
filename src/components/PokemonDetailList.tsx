@@ -53,13 +53,19 @@ const PokemonDetailList = ({ details }: Props) => {
       {/* 特性 */}
       <section className={panelClassName}>
         <h2>特性</h2>
-        <ul>
+        <ul className="divide-y divide-slate-200 dark:divide-slate-700">
           {details.abilities.map((ability) => (
-            <li key={ability.name}>
-              {ability.isHidden && <p>隠れ特性</p>}
-              {ability.name}
+            <li key={ability.name} className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-lg text-slate-700 dark:text-slate-200">{ability.name}</span>
+
+                  {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
+                </div>
+
+                <span className="text-sm text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "日本語の説明文がありません"}</span>
+              </div>
             </li>
-            // 説明文
           ))}
         </ul>
       </section>
