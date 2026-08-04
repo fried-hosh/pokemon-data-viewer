@@ -16,7 +16,6 @@ const PokemonSchema = z.object({
   abilities: z.array(
     z.object({
       ability: z.object({
-        name: z.string(),
         url: z.string(),
       }),
       is_hidden: z.boolean(),
@@ -60,6 +59,14 @@ const AbilitySchema = z.object({
       language: z.object({
         name: z.string(),
       }),
+    }),
+  ),
+  names: z.array(
+    z.object({
+      language: z.object({
+        name: z.string(),
+      }),
+      name: z.string(),
     }),
   ),
 });
@@ -124,7 +131,11 @@ export type PokemonDetails = {
   imageUrl: string | null;
   types: PokemonType[];
   stats: { name: string; baseStat: number }[];
-  abilities: { name: string; isHidden: boolean; description: string | null }[];
+  abilities: {
+    isHidden: boolean;
+    description: string | null;
+    name: string | null;
+  }[];
   evolutions: EvolutionItem[];
 };
 
@@ -150,26 +161,26 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
 
   const pokemonData = pokemonResult.data;
 
-  // 特性の説明文
-  const abilityDescriptionUrls = pokemonData.abilities.map((ability) => ability.ability.url);
-  const abilityDescriptionResponses = await Promise.all(abilityDescriptionUrls.map((url) => fetch(url)));
+  // 特性の詳細
+  const abilityDetailUrls = pokemonData.abilities.map((ability) => ability.ability.url);
+  const abilityDetailResponses = await Promise.all(abilityDetailUrls.map((url) => fetch(url)));
 
-  for (const res of abilityDescriptionResponses) {
+  for (const res of abilityDetailResponses) {
     if (!res.ok) {
       throw new Error(`abilityDescriptionの取得失敗: ${res.status}`);
     }
   }
 
-  const rawAbilityDescriptions: unknown = await Promise.all(abilityDescriptionResponses.map((res) => res.json()));
+  const rawAbilityDetails: unknown = await Promise.all(abilityDetailResponses.map((res) => res.json()));
 
-  const abilityResult = AbilityArraySchema.safeParse(rawAbilityDescriptions);
+  const abilityResult = AbilityArraySchema.safeParse(rawAbilityDetails);
 
   if (!abilityResult.success) {
     console.error(abilityResult.error);
     throw new Error("abilityレスポンスの形式が想定と異なります");
   }
 
-  const abilityDescriptionsData = abilityResult.data;
+  const abilityDetailsData = abilityResult.data;
 
   // species
   const speciesRes = await fetch(pokemonData.species.url);
@@ -243,19 +254,19 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   }));
 
   // 特性の名前と説明文をインデックスで対応させる
-  const descriptions = abilityDescriptionsData.map((abilityData) => {
+  const abilityDetails = abilityDetailsData.map((abilityData) => {
     const description = abilityData.flavor_text_entries.filter((entry) => entry.language.name === "ja").at(-1)?.flavor_text ?? null;
-    // 1.日本語説明が見つからない場合のnull
-    return description;
+    const jaName = abilityData.names.find((name) => name.language.name === "ja-hrkt")?.name ?? null;
+
+    return { description, jaName };
   });
 
   const abilities = pokemonData.abilities.map((ability, index) => {
-    // 2.指定したインデックスに要素がない場合のnull
-    const description = descriptions[index] ?? null;
+    const abilityDetail = abilityDetails[index] ?? null;
     return {
-      name: ability.ability.name,
+      name: abilityDetail?.jaName ?? null,
       isHidden: ability.is_hidden,
-      description,
+      description: abilityDetail?.description ?? null,
     };
   });
 
