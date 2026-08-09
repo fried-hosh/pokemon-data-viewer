@@ -159,7 +159,6 @@ export type PokemonDetails = {
     description: string | null;
     name: string | null;
   }[];
-  evolutions: EvolutionItem[];
   evolutionPaths: EvolutionPath[];
   evolutionArtworks: EvolutionArtwork[];
 };
@@ -168,10 +167,6 @@ type EvolutionConditions = {
   minLevel: number | null;
   trigger: string | null;
   item: string | null;
-};
-type EvolutionItem = {
-  name: string;
-  evolutionDetails: EvolutionConditions[];
 };
 // 原種null解決後に使うフォーム型
 type PokemonReference = {
@@ -307,20 +302,7 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   const evolutionPaths: EvolutionPath[] = [];
 
   // 進化チェーンから全ポケモン名を再帰取得
-  const getEvolutionItems = async (node: EvolutionNode): Promise<EvolutionItem[]> => {
-    const evolutionDetails = node.evolution_details.map((detail) => ({
-      minLevel: detail.min_level,
-      trigger: detail.trigger?.name ?? null,
-      item: detail.item?.name ?? null,
-    }));
-
-    const evolutionItems = [
-      {
-        name: node.species.name,
-        evolutionDetails,
-      },
-    ];
-
+  const getEvolutionItems = async (node: EvolutionNode): Promise<void> => {
     for (const nextNode of node.evolves_to) {
       for (const detail of nextNode.evolution_details) {
         // メインシリーズ以外の進化条件(evolution_details)を省く
@@ -346,14 +328,11 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
           },
         });
       }
-      const nextItems = await getEvolutionItems(nextNode);
-      evolutionItems.push(...nextItems);
+      await getEvolutionItems(nextNode);
     }
-
-    return evolutionItems;
   };
 
-  const evolutionItems = await getEvolutionItems(evolutionData.chain);
+  await getEvolutionItems(evolutionData.chain);
 
   // 作成したevolutionPathsの中から選択中のフォルムに関連するチェーンを絞り込む
   const connectedPokemonNames = new Set<string>([pokemonData.name]);
@@ -445,7 +424,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     types,
     stats,
     abilities,
-    evolutions: evolutionItems,
     evolutionPaths: selectedEvolutionPathArray,
     evolutionArtworks: evolutionArtworks,
   };
