@@ -135,6 +135,13 @@ const EvolutionChainSchema = z.object({
   chain: EvolutionNodeSchema,
 });
 
+// 進化表に使うスプライトのスキーマ
+const EvolutionPokemonSchema = PokemonSchema.pick({
+  name: true,
+  sprites: true,
+});
+const EvolutionChainArraySchema = z.array(EvolutionPokemonSchema);
+
 /* ========================================
    型
 ======================================== */
@@ -154,6 +161,7 @@ export type PokemonDetails = {
   }[];
   evolutions: EvolutionItem[];
   evolutionPaths: EvolutionPath[];
+  evolutionArtworks: EvolutionArtwork[];
 };
 
 type EvolutionConditions = {
@@ -177,6 +185,11 @@ type EvolutionPath = {
   from: PokemonReference;
   to: PokemonReference;
   evoDetails: EvolutionConditions;
+};
+
+type EvolutionArtwork = {
+  name: string;
+  sprite: string | null;
 };
 
 /* ========================================
@@ -367,6 +380,38 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   // パスの並びをSetの発見順から正しい順番に直す
   const selectedEvolutionPathArray = evolutionPaths.filter((path) => selectedEvolutionPaths.has(path));
 
+  // pathのurlからpokemonをfetchしてアートワークを取得
+  let evolutionArtworks: EvolutionArtwork[];
+  const selectedEvolutionPathArrayUrls = selectedEvolutionPathArray.flatMap((path) => [path.from.url, path.to.url]);
+  const uniqueEvoPathUrls = [...new Set(selectedEvolutionPathArrayUrls)];
+  // 無進化ポケモンの場合はfetchせずpokemonDataから取り出す
+  if (uniqueEvoPathUrls.length === 0) {
+    evolutionArtworks = [
+      {
+        name: pokemonData.name,
+        sprite: pokemonData.sprites.other["official-artwork"].front_default,
+      },
+    ];
+  } else {
+    const pokemonArtworkRes = await Promise.all(uniqueEvoPathUrls.map((url) => fetch(url)));
+    for (const res of pokemonArtworkRes) {
+      if (!res.ok) {
+        throw new Error(`進化表用pokemonの取得失敗: ${res.status}`);
+      }
+    }
+    const rawPokemonArtworks: unknown = await Promise.all(pokemonArtworkRes.map((res) => res.json()));
+    const pokemonArtworkResults = EvolutionChainArraySchema.safeParse(rawPokemonArtworks);
+    if (!pokemonArtworkResults.success) {
+      console.error(pokemonArtworkResults.error);
+      throw new Error("pokemonレスポンスの形式が想定と異なります");
+    }
+    const pokemonArtworkData = pokemonArtworkResults.data;
+    evolutionArtworks = pokemonArtworkData.map((data) => ({
+      name: data.name,
+      sprite: data.sprites.other["official-artwork"].front_default,
+    }));
+  }
+
   // タイプ整形
 
   const types = [...pokemonData.types].sort((a, b) => a.slot - b.slot).map((type) => type.type.name);
@@ -402,5 +447,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     abilities,
     evolutions: evolutionItems,
     evolutionPaths: selectedEvolutionPathArray,
+    evolutionArtworks: evolutionArtworks,
   };
 };
