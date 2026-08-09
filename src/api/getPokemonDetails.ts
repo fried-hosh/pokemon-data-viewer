@@ -77,10 +77,33 @@ const SpeciesSchema = z.object({
   evolution_chain: z.object({
     url: z.string(),
   }),
+  varieties: z.array(
+    z.object({
+      is_default: z.boolean(),
+      pokemon: z.object({
+        name: z.string(),
+        url: z.string(),
+      }),
+    }),
+  ),
 });
 
 // 進化条件
 const EvolutionDetailSchema = z.object({
+  base_form: z
+    .object({
+      name: z.string(),
+      url: z.string(),
+    })
+    .nullable(),
+  evolved_form: z
+    .object({
+      name: z.string(),
+      url: z.string(),
+    })
+    .nullable(),
+  // 代表的な進化条件かどうか(グレイシア: こおりのいし = true, ⚪︎⚪︎でレベルアップ = false)
+  is_default: z.boolean(),
   min_level: z.number().nullable(),
   item: z
     .object({
@@ -98,6 +121,7 @@ const EvolutionDetailSchema = z.object({
 const EvolutionNodeSchema = z.object({
   species: z.object({
     name: z.string(),
+    url: z.string(),
   }),
   evolution_details: z.array(EvolutionDetailSchema),
 
@@ -114,16 +138,8 @@ const EvolutionChainSchema = z.object({
 /* ========================================
    型
 ======================================== */
+type SpeciesData = z.infer<typeof SpeciesSchema>;
 type EvolutionNode = z.infer<typeof EvolutionNodeSchema>;
-
-type EvolutionItem = {
-  name: string;
-  evolutionDetails: {
-    minLevel: number | null;
-    trigger: string | null;
-    item: string | null;
-  }[];
-};
 
 export type PokemonDetails = {
   id: number;
@@ -137,6 +153,30 @@ export type PokemonDetails = {
     name: string | null;
   }[];
   evolutions: EvolutionItem[];
+  evolutionPaths: EvolutionPath[];
+};
+
+type EvolutionConditions = {
+  minLevel: number | null;
+  trigger: string | null;
+  item: string | null;
+};
+type EvolutionItem = {
+  name: string;
+  evolutionDetails: EvolutionConditions[];
+};
+// 原種null解決後に使うフォーム型
+type PokemonReference = {
+  name: string;
+  url: string;
+};
+// 原種のnullを解決するまでに使うフォーム型
+type FormInfo = PokemonReference | null;
+// 進化チェーンの線
+type EvolutionPath = {
+  from: PokemonReference;
+  to: PokemonReference;
+  evoDetails: EvolutionConditions;
 };
 
 /* ========================================
@@ -220,9 +260,41 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   /* ========================================
    データ整形
 ======================================== */
+  const getDefaultPokemon = (speciesData: SpeciesData) => {
+    const defaultPokemon = speciesData.varieties.find((variety) => variety.is_default)?.pokemon ?? null;
+
+    return defaultPokemon;
+  };
+
+  const getDefaultPokemonFromSpeciesUrl = async (speciesUrl: string) => {
+    const defaultSpeciesRes = await fetch(speciesUrl);
+    if (!defaultSpeciesRes.ok) {
+      // ページ全体の取得を失敗させないためにthrowしない
+      return null;
+    }
+    const rawDefaultSpeciesRes: unknown = await defaultSpeciesRes.json();
+    const defaultSpeciesResult = SpeciesSchema.safeParse(rawDefaultSpeciesRes);
+    if (!defaultSpeciesResult.success) {
+      console.error(defaultSpeciesResult.error);
+      return null;
+    }
+    const defaultSpeciesData = defaultSpeciesResult.data;
+
+    return getDefaultPokemon(defaultSpeciesData);
+  };
+
+  const resolvePokemonReference = async (form: FormInfo, speciesUrl: string) => {
+    if (form !== null) {
+      return form;
+    }
+
+    return getDefaultPokemonFromSpeciesUrl(speciesUrl);
+  };
+
+  const evolutionPaths: EvolutionPath[] = [];
 
   // 進化チェーンから全ポケモン名を再帰取得
-  const getEvolutionItems = (node: EvolutionNode): EvolutionItem[] => {
+  const getEvolutionItems = async (node: EvolutionNode): Promise<EvolutionItem[]> => {
     const evolutionDetails = node.evolution_details.map((detail) => ({
       minLevel: detail.min_level,
       trigger: detail.trigger?.name ?? null,
@@ -237,14 +309,65 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     ];
 
     for (const nextNode of node.evolves_to) {
-      const nextItems = getEvolutionItems(nextNode);
+      for (const detail of nextNode.evolution_details) {
+        // メインシリーズ以外の進化条件(evolution_details)を省く
+        if (!detail.is_default) {
+          continue;
+        }
+
+        const fromPokemon = await resolvePokemonReference(detail.base_form, node.species.url);
+        const toPokemon = await resolvePokemonReference(detail.evolved_form, nextNode.species.url);
+
+        // 原種のvarieties isDefault取得に失敗した場合
+        if (fromPokemon === null || toPokemon === null) {
+          continue;
+        }
+
+        evolutionPaths.push({
+          from: fromPokemon,
+          to: toPokemon,
+          evoDetails: {
+            minLevel: detail.min_level,
+            trigger: detail.trigger?.name ?? null,
+            item: detail.item?.name ?? null,
+          },
+        });
+      }
+      const nextItems = await getEvolutionItems(nextNode);
       evolutionItems.push(...nextItems);
     }
 
     return evolutionItems;
   };
 
-  const evolutionItems = getEvolutionItems(evolutionData.chain);
+  const evolutionItems = await getEvolutionItems(evolutionData.chain);
+
+  // 作成したevolutionPathsの中から選択中のフォルムに関連するチェーンを絞り込む
+  const connectedPokemonNames = new Set<string>([pokemonData.name]);
+  const selectedEvolutionPaths = new Set<EvolutionPath>();
+
+  let foundNewPath = true;
+  while (foundNewPath) {
+    foundNewPath = false;
+
+    for (const path of evolutionPaths) {
+      const isIncludeForm = connectedPokemonNames.has(path.from.name) || connectedPokemonNames.has(path.to.name);
+
+      // ヒトカゲ -> リザード, リザード -> リザードン, リザードン -> ... を探す
+      // whileの二周目で前半の条件が引っかかって終了する
+      if (!selectedEvolutionPaths.has(path) && isIncludeForm) {
+        selectedEvolutionPaths.add(path);
+        connectedPokemonNames.add(path.from.name);
+        connectedPokemonNames.add(path.to.name);
+
+        foundNewPath = true;
+      }
+    }
+  }
+  // パスの並びをSetの発見順から正しい順番に直す
+  const selectedEvolutionPathArray = evolutionPaths.filter((path) => selectedEvolutionPaths.has(path));
+
+  // タイプ整形
 
   const types = [...pokemonData.types].sort((a, b) => a.slot - b.slot).map((type) => type.type.name);
 
@@ -278,5 +401,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     stats,
     abilities,
     evolutions: evolutionItems,
+    evolutionPaths: selectedEvolutionPathArray,
   };
 };
