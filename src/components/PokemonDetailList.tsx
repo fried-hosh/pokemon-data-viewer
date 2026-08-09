@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { type PokemonDetails } from "../api/getPokemonDetails";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
 
@@ -42,10 +43,14 @@ const PokemonDetailList = ({ details }: Props) => {
       {/* 進化チェーン */}
       <section className={panelClassName}>
         <h2>進化表</h2>
-        <ul>
-          {details.evolutions.map((evo) => (
-            <li key={evo.name}>{evo.name}</li>
-            // 各画像
+        <ul className="flex">
+          {details.evolutionArtworks.map((artwork) => (
+            <li key={artwork.name}>
+              <Link to={`/pokemon/${artwork.name}`}>
+                {artwork.sprite !== null && <img src={artwork.sprite} alt={artwork.name} />}
+                <span>{artwork.name}</span>
+              </Link>
+            </li>
           ))}
         </ul>
       </section>
