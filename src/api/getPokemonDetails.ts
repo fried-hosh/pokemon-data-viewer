@@ -176,13 +176,13 @@ type PokemonReference = {
 // 原種のnullを解決するまでに使うフォーム型
 type FormInfo = PokemonReference | null;
 // 進化チェーンの線
-type EvolutionPath = {
+export type EvolutionPath = {
   from: PokemonReference;
   to: PokemonReference;
   evoDetails: EvolutionConditions;
 };
 
-type EvolutionArtwork = {
+export type EvolutionArtwork = {
   name: string;
   sprite: string | null;
 };

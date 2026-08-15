@@ -1,18 +1,13 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { getPokemonDetails, type PokemonDetails } from "../api/getPokemonDetails";
+import { type PokemonDetails } from "../api/getPokemonDetails";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import PokemonEvolutionPanel from "./PokemonEvolutionPanel";
 
 type Props = {
   details: PokemonDetails;
 };
 
-type EvolutionSelectionStatus = "idle" | "pending" | "error";
-
 const PokemonDetailList = ({ details }: Props) => {
-  const queryClient = useQueryClient();
-
+  // 合計種族値
   const totalStats = details.stats
     .map((stat) => stat.baseStat)
     .reduce((acc, cur) => {
@@ -23,32 +18,6 @@ const PokemonDetailList = ({ details }: Props) => {
   const panelClassName = "p-5 rounded-2xl border text-left shadow-lg border-[var(--border)] bg-[var(--code-bg)]";
   // 種族値ゲージの上限値
   const MAX_BASE_STAT = 255;
-
-  // 進化表選択時の 通常時, ロード中, 取得失敗時 の状態管理
-  const [selectionStatus, setSelectionStatus] = useState<EvolutionSelectionStatus>("idle");
-
-  // 進化画像クリックで取得中と取得失敗時に画面遷移しないようにする
-  const navigate = useNavigate();
-  const handleEvolutionSelect = async (pokemonName: string) => {
-    setSelectionStatus("pending");
-
-    try {
-      await queryClient.fetchQuery({
-        queryKey: ["pokemonDetail", pokemonName],
-        queryFn: () => getPokemonDetails(pokemonName),
-        staleTime: Infinity,
-      });
-      // 成功したらURL変更
-      navigate(`/pokemon/${pokemonName}`);
-
-      setSelectionStatus("idle");
-
-      console.log(`${pokemonName}の取得成功`);
-    } catch (error) {
-      setSelectionStatus("error");
-      console.error(`${pokemonName}の取得失敗`, error);
-    }
-  };
 
   return (
     <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2 ">
@@ -73,21 +42,7 @@ const PokemonDetailList = ({ details }: Props) => {
       </section>
 
       {/* 進化チェーン */}
-      <section className={panelClassName}>
-        <h2>進化表</h2>
-        {selectionStatus === "pending" && <p>更新中...</p>}
-        {selectionStatus === "error" && <p className="text-red-500">取得に失敗しました</p>}
-        <ul className="flex">
-          {details.evolutionArtworks.map((artwork) => (
-            <li key={artwork.name}>
-              <button type="button" disabled={selectionStatus === "pending"} onClick={() => handleEvolutionSelect(artwork.name)}>
-                {artwork.sprite !== null && <img src={artwork.sprite} alt={artwork.name} />}
-                <span>{artwork.name}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <PokemonEvolutionPanel details={details} panelClassName={panelClassName} />
 
       {/* 特性 */}
       <section className={panelClassName}>
