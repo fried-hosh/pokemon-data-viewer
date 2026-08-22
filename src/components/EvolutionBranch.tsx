@@ -1,4 +1,5 @@
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
+import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
 
 type EvolutionBranchProps = {
   startPokemonName: string;
@@ -19,8 +20,25 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
   }
   const sprite = evolutionArtworks.find((artwork) => artwork.name === startPokemonName)?.sprite ?? null;
 
+  // 進化条件を拾うためのパス
+  const currentPath = evolutionPaths.find((path) => path.to.name === startPokemonName);
+  const conditions = currentPath?.evoDetails ?? null;
+
+  const formattedConditions = formatEvolutionConditions(conditions);
+
   return (
     <li className="flex">
+      {/* 進化条件 */}
+      <div>
+        {conditions !== null &&
+          formattedConditions.map((condition) => (
+            <p key={condition.key}>
+              {condition.label}: {condition.value}
+            </p>
+          ))}
+      </div>
+
+      {/* 名前・スプライト */}
       <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending}>
         <span>{startPokemonName}</span>
         {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={startPokemonName} />}

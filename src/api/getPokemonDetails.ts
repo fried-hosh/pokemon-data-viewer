@@ -89,32 +89,51 @@ const SpeciesSchema = z.object({
 });
 
 // 進化条件
+const NamedApiResourceSchema = z.object({
+  name: z.string(),
+  url: z.string(),
+});
+
 const EvolutionDetailSchema = z.object({
-  base_form: z
-    .object({
-      name: z.string(),
-      url: z.string(),
-    })
-    .nullable(),
-  evolved_form: z
-    .object({
-      name: z.string(),
-      url: z.string(),
-    })
-    .nullable(),
+  base_form: NamedApiResourceSchema.nullable(),
+  evolved_form: NamedApiResourceSchema.nullable(),
+  item: NamedApiResourceSchema.nullable(),
+  held_item: NamedApiResourceSchema.nullable(),
+  known_move: NamedApiResourceSchema.nullable(),
+  known_move_type: NamedApiResourceSchema.nullable(),
+  location: NamedApiResourceSchema.nullable(),
+  party_species: NamedApiResourceSchema.nullable(),
+  party_type: NamedApiResourceSchema.nullable(),
+  region: NamedApiResourceSchema.nullable(),
+  trade_species: NamedApiResourceSchema.nullable(),
+  used_move: NamedApiResourceSchema.nullable(),
+  trigger: NamedApiResourceSchema,
+  gender: z.number().int().nullable(),
+  min_affection: z.number().int().nullable(),
+  min_beauty: z.number().int().nullable(),
+  min_damage_taken: z.number().int().nullable(),
+  min_happiness: z.number().int().nullable(),
+  min_level: z.number().int().nullable(),
+  min_move_count: z.number().int().nullable(),
+  min_steps: z.number().int().nullable(),
+  relative_physical_stats: z.number().int().nullable(),
+  near_special_rock: z.boolean(),
+  needs_multiplayer: z.boolean(),
+  needs_overworld_rain: z.boolean(),
+  turn_upside_down: z.boolean(),
+  time_of_day: z.string(),
   // 代表的な進化条件かどうか(グレイシア: こおりのいし = true, ⚪︎⚪︎でレベルアップ = false)
   is_default: z.boolean(),
-  min_level: z.number().nullable(),
-  item: z
-    .object({
+});
+
+// アイテム・技・場所等の日本語名
+const NamedApiResourceToJaSchema = z.object({
+  names: z.array(
+    z.object({
+      language: z.object({ name: z.string() }),
       name: z.string(),
-    })
-    .nullable(),
-  trigger: z
-    .object({
-      name: z.string(),
-    })
-    .nullable(),
+    }),
+  ),
 });
 
 // 一件分の再帰スキーマ
@@ -147,6 +166,7 @@ const EvolutionChainArraySchema = z.array(EvolutionPokemonSchema);
 ======================================== */
 type SpeciesData = z.infer<typeof SpeciesSchema>;
 type EvolutionNode = z.infer<typeof EvolutionNodeSchema>;
+type NamedApiResource = z.infer<typeof NamedApiResourceSchema>;
 
 export type PokemonDetails = {
   id: number;
@@ -163,10 +183,37 @@ export type PokemonDetails = {
   evolutionArtworks: EvolutionArtwork[];
 };
 
-type EvolutionConditions = {
+type NamedApiResourceWithJa = {
+  name: string;
+  jaName: string;
+};
+
+export type EvolutionConditions = {
+  item: NamedApiResourceWithJa | null;
+  heldItem: NamedApiResourceWithJa | null;
+  knownMove: NamedApiResourceWithJa | null;
+  knownMoveType: NamedApiResourceWithJa | null;
+  location: NamedApiResourceWithJa | null;
+  partySpecies: NamedApiResourceWithJa | null;
+  partyType: NamedApiResourceWithJa | null;
+  region: NamedApiResourceWithJa | null;
+  tradeSpecies: NamedApiResourceWithJa | null;
+  usedMove: NamedApiResourceWithJa | null;
+  trigger: NamedApiResource;
+  gender: number | null;
+  minAffection: number | null;
+  minBeauty: number | null;
+  minDamageTaken: number | null;
+  minHappiness: number | null;
   minLevel: number | null;
-  trigger: string | null;
-  item: string | null;
+  minMoveCount: number | null;
+  minSteps: number | null;
+  relativePhysicalStats: number | null;
+  nearSpecialRock: boolean;
+  needsMultiplayer: boolean;
+  needsOverworldRain: boolean;
+  turnUpsideDown: boolean;
+  timeOfDay: string;
 };
 // 原種null解決後に使うフォーム型
 type PokemonReference = {
@@ -264,7 +311,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   }
 
   const evolutionData = evolutionChainResult.data;
-
   /* ========================================
    データ整形
 ======================================== */
@@ -299,6 +345,35 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     return getDefaultPokemonFromSpeciesUrl(speciesUrl);
   };
 
+  // 日本語名を取り出す
+  const getLocalizedResource = async (resource: NamedApiResource | null): Promise<NamedApiResourceWithJa | null> => {
+    if (resource === null) {
+      return null;
+    }
+    const fallbackResource: NamedApiResourceWithJa = {
+      name: resource.name,
+      jaName: resource.name,
+    };
+    const jaNameRes = await fetch(resource.url);
+    if (!jaNameRes.ok) {
+      console.error("進化条件の日本語名を取得できませんでした");
+      return fallbackResource;
+    }
+    const rawJaNameRes: unknown = await jaNameRes.json();
+    const jaNameResult = NamedApiResourceToJaSchema.safeParse(rawJaNameRes);
+    if (!jaNameResult.success) {
+      console.error(jaNameResult.error);
+      return fallbackResource;
+    }
+    const jaNameData = jaNameResult.data;
+
+    const jaName = jaNameData.names.find((name) => name.language.name === "ja-hrkt") ?? null;
+    return {
+      name: resource.name,
+      jaName: jaName?.name ?? resource.name,
+    };
+  };
+
   const evolutionPaths: EvolutionPath[] = [];
 
   // 進化チェーンから全ポケモン名を再帰取得
@@ -322,9 +397,31 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
           from: fromPokemon,
           to: toPokemon,
           evoDetails: {
+            item: await getLocalizedResource(detail.item),
+            heldItem: await getLocalizedResource(detail.held_item),
+            knownMove: await getLocalizedResource(detail.known_move),
+            knownMoveType: await getLocalizedResource(detail.known_move_type),
+            location: await getLocalizedResource(detail.location),
+            partySpecies: await getLocalizedResource(detail.party_species),
+            partyType: await getLocalizedResource(detail.party_type),
+            region: await getLocalizedResource(detail.region),
+            tradeSpecies: await getLocalizedResource(detail.trade_species),
+            usedMove: await getLocalizedResource(detail.used_move),
+            trigger: detail.trigger,
+            gender: detail.gender,
+            minAffection: detail.min_affection,
+            minBeauty: detail.min_beauty,
+            minDamageTaken: detail.min_damage_taken,
+            minHappiness: detail.min_happiness,
             minLevel: detail.min_level,
-            trigger: detail.trigger?.name ?? null,
-            item: detail.item?.name ?? null,
+            minMoveCount: detail.min_move_count,
+            minSteps: detail.min_steps,
+            relativePhysicalStats: detail.relative_physical_stats,
+            nearSpecialRock: detail.near_special_rock,
+            needsMultiplayer: detail.needs_multiplayer,
+            needsOverworldRain: detail.needs_overworld_rain,
+            turnUpsideDown: detail.turn_upside_down,
+            timeOfDay: detail.time_of_day,
           },
         });
       }
@@ -335,6 +432,7 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   await getEvolutionItems(evolutionData.chain);
 
   // 作成したevolutionPathsの中から選択中のフォルムに関連するチェーンを絞り込む
+  // 原種ニャースを検索した場合、アローラ、ガラルのフォルムを省く
   const connectedPokemonNames = new Set<string>([pokemonData.name]);
   const selectedEvolutionPaths = new Set<EvolutionPath>();
 
