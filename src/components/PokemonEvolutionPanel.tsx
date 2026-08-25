@@ -54,9 +54,11 @@ const PokemonEvolutionPanel = ({ details, panelClassName }: EvolutionPanelProps)
       </div>
 
       {/* 進化表 */}
-      <ul>
-        <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} />
-      </ul>
+      <div className="overflow-x-auto">
+        <ul className="min-w-max lg:min-w-0">
+          <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} />
+        </ul>
+      </div>
     </section>
   );
 };
