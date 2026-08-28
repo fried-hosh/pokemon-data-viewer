@@ -3,6 +3,7 @@ import { getPokemonDetails, type PokemonDetails } from "../api/getPokemonDetails
 import EvolutionBranch from "./EvolutionBranch";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import MobileEvolutionBranch from "./MobileEvolutionBranch";
 
 type EvolutionPanelProps = {
   details: PokemonDetails;
@@ -54,7 +55,15 @@ const PokemonEvolutionPanel = ({ details, panelClassName }: EvolutionPanelProps)
       </div>
 
       {/* 進化表 */}
-      <div className="overflow-x-auto">
+
+      {/* モバイル版 */}
+      <div className="lg:hidden overflow-auto">
+        <ul>
+          <MobileEvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} />
+        </ul>
+      </div>
+      {/* PC版 */}
+      <div className="hidden lg:block overflow-x-auto">
         <ul className="min-w-max lg:min-w-0">
           <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} />
         </ul>

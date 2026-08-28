@@ -109,3 +109,42 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* ========================================
+   MobileEvolutionBranch.tsx - 進化表の分岐線レイアウト
+======================================== */
+.mobile-evolution-branches > li {
+  position: relative;
+}
+/* liの最後の要素以外 */
+.mobile-evolution-branches > li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* 根本ポケモン画像のsizeが18、中央が9、かつ子がml-17。 17-9=8=32px=2rem で根本画像の中心に辿り着けるため */
+  left: -2rem;
+  width: 1px;
+  background-color: var(--color-slate-500);
+}
+.mobile-evolution-branches > li > div {
+  position: relative;
+}
+.mobile-evolution-branches > li:last-child > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 50%;
+  left: -2rem;
+  width: 1px;
+  background-color: var(--color-slate-500);
+}
+.mobile-evolution-branches > li > div::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -2rem;
+  width: 2rem;
+  height: 1px;
+  background-color: var(--color-slate-500);
+}

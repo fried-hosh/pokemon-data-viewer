@@ -18,8 +18,6 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
       branchPaths.push(path);
     }
   }
-  console.log("🚀 ~ EvolutionBranch ~ branchPaths:", branchPaths);
-  console.log("🚀 ~ EvolutionBranch ~ evolutionArtworks:", evolutionArtworks);
 
   // イーブイ用レイアウトに使う判定
   const directEvolutionNames = branchPaths.map((path) => path.to.name);
@@ -39,7 +37,6 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
   const conditions = currentPath?.evoDetails ?? null;
 
   const formattedConditions = formatEvolutionConditions(conditions);
-  console.log("🚀 ~ EvolutionBranch ~ formattedConditions:", formattedConditions);
 
   return (
     <li
