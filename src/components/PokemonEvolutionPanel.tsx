@@ -39,33 +39,31 @@ const PokemonEvolutionPanel = ({ details, panelClassName }: EvolutionPanelProps)
   const rootPokemonName = details.evolutionPaths[0]?.from.name ?? details.name;
   return (
     <section className={panelClassName}>
-      <div className="flex justify-between">
-        <h2>進化表</h2>
+      <h2 className="sr-only">進化表</h2>
 
-        {/* スピナー */}
-        <div className="whitespace-nowrap" aria-live="polite">
-          {selectionStatus === "pending" && (
-            <span className="flex items-center gap-2">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-orange-500" aria-hidden="true" />
-              <span>更新中...</span>
-            </span>
-          )}
-          {selectionStatus === "error" && <p className="text-red-500">取得に失敗しました</p>}
-        </div>
+      {/* スピナー */}
+      <div className="flex min-h-6 justify-end" aria-live="polite">
+        {selectionStatus === "pending" && (
+          <span className="flex items-center gap-2">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-orange-500" aria-hidden="true" />
+            <span>更新中...</span>
+          </span>
+        )}
+        {selectionStatus === "error" && <p className="text-red-500">取得に失敗しました</p>}
       </div>
 
       {/* 進化表 */}
 
       {/* モバイル版 */}
-      <div className="lg:hidden overflow-auto">
+      <div className="lg:hidden">
         <ul>
-          <MobileEvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} />
+          <MobileEvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} />
         </ul>
       </div>
       {/* PC版 */}
-      <div className="hidden lg:block overflow-x-auto">
-        <ul className="min-w-max lg:min-w-0">
-          <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} />
+      <div className="hidden lg:block overflow-auto">
+        <ul className="p-1 min-w-max lg:min-w-0">
+          <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} />
         </ul>
       </div>
     </section>

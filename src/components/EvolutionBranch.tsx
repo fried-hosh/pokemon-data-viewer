@@ -1,4 +1,5 @@
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
+import { SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
 
 type EvolutionBranchProps = {
@@ -7,10 +8,11 @@ type EvolutionBranchProps = {
   evolutionArtworks: EvolutionArtwork[];
   onSelect: (pokemonName: string) => Promise<void>;
   isPending: boolean;
+  selectedPokemonName: string;
 };
 
 // 再帰コンポーネントで進化チェーンを返す
-const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, onSelect, isPending }: EvolutionBranchProps) => {
+const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, onSelect, isPending, selectedPokemonName }: EvolutionBranchProps) => {
   const branchPaths: EvolutionPath[] = [];
 
   for (const path of evolutionPaths) {
@@ -38,6 +40,8 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
 
   const formattedConditions = formatEvolutionConditions(conditions);
 
+  const isSelected = startPokemonName === selectedPokemonName;
+
   return (
     <li
       className="relative flex items-center
@@ -48,7 +52,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
     >
       {conditions !== null && <span aria-hidden="true" className="h-px w-8 bg-slate-500" />}
       {/* 進化条件 */}
-      <div>
+      <div className={`${isSelected ? `${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
         {conditions !== null &&
           formattedConditions.map((condition) => (
             <p key={condition.key}>
@@ -59,7 +63,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
       {conditions !== null && <span aria-hidden="true" className="h-px w-8 bg-slate-500" />}
 
       {/* 名前・スプライト */}
-      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending}>
+      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}>
         {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={startPokemonName} />}
         <span>{startPokemonName}</span>
       </button>
@@ -72,17 +76,18 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
             <ul className="grid grid-cols-3 border rounded-xl gap-2 p-2">
               {branchPaths.map((path) => {
                 const sprite = getSprite(path.to.name);
+                const isBranchSelected = selectedPokemonName === path.to.name;
                 return (
-                  <li key={path.to.name} className="flex flex-col items-center border p-2">
+                  <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 ml-2 mr-2 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+                    <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending}>
+                      {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={path.to.name} />}
+                      <span>{path.to.name}</span>
+                    </button>
                     {formatEvolutionConditions(path.evoDetails).map((condition) => (
                       <p key={condition.key}>
                         {condition.label}: {condition.value}
                       </p>
                     ))}
-                    <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending} className="mt-auto">
-                      {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={path.to.name} />}
-                      <span>{path.to.name}</span>
-                    </button>
                   </li>
                 );
               })}
@@ -91,7 +96,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
             // 通常レイアウト
             <ul>
               {branchPaths.map((path) => (
-                <EvolutionBranch key={path.to.name} startPokemonName={path.to.name} evolutionPaths={evolutionPaths} evolutionArtworks={evolutionArtworks} onSelect={onSelect} isPending={isPending} />
+                <EvolutionBranch key={path.to.name} startPokemonName={path.to.name} evolutionPaths={evolutionPaths} evolutionArtworks={evolutionArtworks} onSelect={onSelect} isPending={isPending} selectedPokemonName={selectedPokemonName} />
               ))}
             </ul>
           )}
