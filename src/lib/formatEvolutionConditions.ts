@@ -165,7 +165,7 @@ export const formatEvolutionConditions = (conditions: EvolutionConditions | null
     formattedConditions.push({
       key: "minLevel",
       label: "必要レベル",
-      value: `${conditions.minLevel}以上`,
+      value: `${conditions.minLevel}`,
     });
   }
   if (conditions.minMoveCount !== null) {

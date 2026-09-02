@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getPokemonDetails, type PokemonDetails } from "../api/getPokemonDetails";
+import { getPokemonDetails, type EvolutionPath, type PokemonDetails } from "../api/getPokemonDetails";
 import EvolutionBranch from "./EvolutionBranch";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +37,20 @@ const PokemonEvolutionPanel = ({ details, panelClassName }: EvolutionPanelProps)
   };
 
   const rootPokemonName = details.evolutionPaths[0]?.from.name ?? details.name;
+  // 選択中のポケモンから根本までのパスを確保 / 線の着色用
+  const selectedPaths: EvolutionPath[] = [];
+  let currentName = details.name;
+  let isFoundNextPath = true;
+  while (isFoundNextPath) {
+    isFoundNextPath = false;
+    const foundPath = details.evolutionPaths.find((path) => path.to.name === currentName);
+    if (foundPath) {
+      isFoundNextPath = true;
+      selectedPaths.push(foundPath);
+      currentName = foundPath.from.name;
+    }
+  }
+
   return (
     <section className={panelClassName}>
       <h2 className="sr-only">進化表</h2>
@@ -57,13 +71,13 @@ const PokemonEvolutionPanel = ({ details, panelClassName }: EvolutionPanelProps)
       {/* モバイル版 */}
       <div className="lg:hidden">
         <ul>
-          <MobileEvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} />
+          <MobileEvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} selectedPaths={selectedPaths} />
         </ul>
       </div>
       {/* PC版 */}
       <div className="hidden lg:block overflow-auto">
         <ul className="p-1 min-w-max lg:min-w-0">
-          <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} />
+          <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} selectedPaths={selectedPaths} />
         </ul>
       </div>
     </section>
