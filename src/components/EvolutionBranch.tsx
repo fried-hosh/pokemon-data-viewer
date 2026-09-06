@@ -156,7 +156,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
             // 通常レイアウト
             <div className="relative">
               {/* 分岐の縦線 */}
-              {selectedLinePosition !== null && <span className={`absolute left-0 w-0.5 z-10 aria-hidden ${SELECTED_POKEMON_BAR_CLASS_NAME}`} style={{ height: selectedLinePosition.height, top: selectedLinePosition.top }} />}
+              {selectedLinePosition !== null && <span aria-hidden="true" className={`absolute left-0 w-0.5 z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}`} style={{ height: selectedLinePosition.height, top: selectedLinePosition.top }} />}
               {/* 再帰呼び出し */}
               <ul ref={branchListRef}>
                 {branchPaths.map((path) => (

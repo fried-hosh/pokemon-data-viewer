@@ -39,7 +39,7 @@ const MobileEvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtw
           type="button"
           onClick={() => onSelect(startPokemonName)}
           disabled={isPending}
-          className={`mt-1 mb-1 p-1
+          className={`mt-1 mb-1 p-1 pointer-coarse:outline-none
         ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}
         >
           <span>{startPokemonName}</span>

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { type PokemonDetails } from "../api/getPokemonDetails";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
 import PokemonEvolutionPanel from "./PokemonEvolutionPanel";
@@ -19,13 +20,16 @@ const PokemonDetailList = ({ details }: Props) => {
   // 種族値ゲージの上限値
   const MAX_BASE_STAT = 255;
 
+  // 進化表のモーダル
+  const evolutionDialogRef = useRef<HTMLDialogElement>(null);
+
   return (
     <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2 ">
-      {/* 基本情報 - 名前、画像、タイプ、特性 */}
+      {/* 基本情報 - 名前、画像、タイプ、特性、進化表モーダル */}
       <section className={panelClassName}>
         <div className="grid grid-cols-2 gap-4">
           {details.imageUrl !== null && <img className="mx-auto h-48 w-48 object-contain" src={details.imageUrl} alt={details.name} />}
-          <div>
+          <div className="flex flex-col gap-2">
             <h2>{details.name}</h2>
             <ul className="flex gap-1 font-bold">
               {details.types.map((type) => {
@@ -37,8 +41,25 @@ const PokemonDetailList = ({ details }: Props) => {
                 );
               })}
             </ul>
+            {/* 進化表モーダル */}
+            <button
+              type="button"
+              className="
+              inline-flex items-center gap-2
+              lg:hidden self-start mt-2 rounded-xl border border-(--border)
+              bg-lime-600/80 dark:bg-white/10 px-3 py-2 shadow-sm
+              transition hover:bg-lime-600 dark:hover:bg-white/25 active:scale-95
+              font-semibold text-white
+              bg-linear-to-br from-amber-500/80 dark:bg-linear-to-tr dark:from-white/40 dark:to-70%
+              "
+              onClick={() => evolutionDialogRef.current?.showModal()}
+            >
+              進化表を見る
+              <span aria-hidden="true">›</span>
+            </button>
           </div>
         </div>
+
         {/* 特性 */}
         <section className={`${panelClassName} mt-2`}>
           <h2>特性</h2>
@@ -60,8 +81,8 @@ const PokemonDetailList = ({ details }: Props) => {
         </section>
       </section>
 
+      {/* 種族値 */}
       <div className="flex flex-col gap-4">
-        {/* 種族値 */}
         <section className={panelClassName}>
           <div className="flex justify-between items-center">
             <h2>種族値</h2>
@@ -94,7 +115,7 @@ const PokemonDetailList = ({ details }: Props) => {
       </div>
 
       {/* 進化チェーン */}
-      <PokemonEvolutionPanel details={details} panelClassName={`${panelClassName} lg:col-span-2`} />
+      <PokemonEvolutionPanel details={details} panelClassName={`${panelClassName} lg:col-span-2`} mobileDialogRef={evolutionDialogRef} />
 
       {/* 覚える技 */}
       <section className={panelClassName}>

@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer base {
+  html:has(dialog:modal) {
+    overflow: hidden;
+  }
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
