@@ -122,7 +122,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
       {conditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
 
       {/* 名前・スプライト */}
-      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}>
+      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
         {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={startPokemonName} />}
         <span>{startPokemonName}</span>
       </button>
@@ -133,7 +133,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
 
           {/* 4分岐以上かつ1進化（イーブイ）でのみ特殊レイアウト */}
           {useManyBranchGrid ? (
-            <ul className="grid grid-cols-3 border rounded-xl gap-2 p-2">
+            <ul className="grid grid-cols-3 border-2 rounded-xl gap-2 p-2 bg-amber-50/60 dark:bg-white/5 shadow-lg">
               {branchPaths.map((path) => {
                 const sprite = getSprite(path.to.name);
                 const isBranchSelected = selectedPokemonName === path.to.name;
