@@ -226,7 +226,7 @@ type FormInfo = PokemonReference | null;
 export type EvolutionPath = {
   from: PokemonReference;
   to: PokemonReference;
-  evoDetails: EvolutionConditions;
+  evoDetails: EvolutionConditions[];
 };
 
 export type EvolutionArtwork = {
@@ -393,37 +393,46 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
           continue;
         }
 
-        evolutionPaths.push({
-          from: fromPokemon,
-          to: toPokemon,
-          evoDetails: {
-            item: await getLocalizedResource(detail.item),
-            heldItem: await getLocalizedResource(detail.held_item),
-            knownMove: await getLocalizedResource(detail.known_move),
-            knownMoveType: await getLocalizedResource(detail.known_move_type),
-            location: await getLocalizedResource(detail.location),
-            partySpecies: await getLocalizedResource(detail.party_species),
-            partyType: await getLocalizedResource(detail.party_type),
-            region: await getLocalizedResource(detail.region),
-            tradeSpecies: await getLocalizedResource(detail.trade_species),
-            usedMove: await getLocalizedResource(detail.used_move),
-            trigger: detail.trigger,
-            gender: detail.gender,
-            minAffection: detail.min_affection,
-            minBeauty: detail.min_beauty,
-            minDamageTaken: detail.min_damage_taken,
-            minHappiness: detail.min_happiness,
-            minLevel: detail.min_level,
-            minMoveCount: detail.min_move_count,
-            minSteps: detail.min_steps,
-            relativePhysicalStats: detail.relative_physical_stats,
-            nearSpecialRock: detail.near_special_rock,
-            needsMultiplayer: detail.needs_multiplayer,
-            needsOverworldRain: detail.needs_overworld_rain,
-            turnUpsideDown: detail.turn_upside_down,
-            timeOfDay: detail.time_of_day,
-          },
-        });
+        const conditions: EvolutionConditions = {
+          item: await getLocalizedResource(detail.item),
+          heldItem: await getLocalizedResource(detail.held_item),
+          knownMove: await getLocalizedResource(detail.known_move),
+          knownMoveType: await getLocalizedResource(detail.known_move_type),
+          location: await getLocalizedResource(detail.location),
+          partySpecies: await getLocalizedResource(detail.party_species),
+          partyType: await getLocalizedResource(detail.party_type),
+          region: await getLocalizedResource(detail.region),
+          tradeSpecies: await getLocalizedResource(detail.trade_species),
+          usedMove: await getLocalizedResource(detail.used_move),
+          trigger: detail.trigger,
+          gender: detail.gender,
+          minAffection: detail.min_affection,
+          minBeauty: detail.min_beauty,
+          minDamageTaken: detail.min_damage_taken,
+          minHappiness: detail.min_happiness,
+          minLevel: detail.min_level,
+          minMoveCount: detail.min_move_count,
+          minSteps: detail.min_steps,
+          relativePhysicalStats: detail.relative_physical_stats,
+          nearSpecialRock: detail.near_special_rock,
+          needsMultiplayer: detail.needs_multiplayer,
+          needsOverworldRain: detail.needs_overworld_rain,
+          turnUpsideDown: detail.turn_upside_down,
+          timeOfDay: detail.time_of_day,
+        };
+        // 今回のfrom,toが既存のパスのfrom,toと一致するかを調べる
+        // ヤバチャ系は条件だけが異なる同名from,toを持つパスが複数返ってくるため、一致した場合は条件文だけをpushしたい
+        const existingPath = evolutionPaths.find((path) => path.from.name === fromPokemon.name && path.to.name === toPokemon.name);
+        if (existingPath) {
+          existingPath.evoDetails.push(conditions);
+        } else {
+          // 大多数のポケモン or ヤバチャ系一周目
+          evolutionPaths.push({
+            from: fromPokemon,
+            to: toPokemon,
+            evoDetails: [conditions],
+          });
+        }
       }
       await getEvolutionItems(nextNode);
     }

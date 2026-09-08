@@ -1,3 +1,4 @@
+import { Fragment } from "react/jsx-runtime";
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
 import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
@@ -48,10 +49,15 @@ const MobileEvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtw
         {/* 進化条件 */}
         {currentConditions !== null && (
           <div className={`flex flex-col ${isSelected ? `${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
-            {formatEvolutionConditions(currentConditions).map((condition) => (
-              <span key={condition.key}>
-                {condition.label}: {condition.value}
-              </span>
+            {currentConditions.map((conditions, index) => (
+              <Fragment key={index}>
+                {index > 0 && <p className="text-center p-1">または</p>}
+                {formatEvolutionConditions(conditions).map((condition) => (
+                  <p key={`${index}-${condition.key}`}>
+                    {condition.label}:{condition.value}
+                  </p>
+                ))}
+              </Fragment>
             ))}
           </div>
         )}

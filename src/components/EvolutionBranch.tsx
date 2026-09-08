@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
 import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
@@ -39,9 +39,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
 
   // 進化条件を拾うためのパス
   const currentPath = evolutionPaths.find((path) => path.to.name === startPokemonName);
-  const conditions = currentPath?.evoDetails ?? null;
-
-  const formattedConditions = formatEvolutionConditions(conditions);
+  const currentConditions = currentPath?.evoDetails ?? null;
 
   const isSelected = startPokemonName === selectedPokemonName;
 
@@ -110,16 +108,21 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
       only:after:hidden"
     >
       {/* 進化条件 */}
-      {conditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
+      {currentConditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
       <div className={`${isSelected ? SELECTED_POKEMON_TEXT_CLASS_NAME : ""}`}>
-        {conditions !== null &&
-          formattedConditions.map((condition) => (
-            <p key={condition.key}>
-              {condition.label}: {condition.value}
-            </p>
+        {currentConditions !== null &&
+          currentConditions.map((conditions, index) => (
+            <Fragment key={index}>
+              {index > 0 && <p className="text-center p-1">または</p>}
+              {formatEvolutionConditions(conditions).map((condition) => (
+                <p key={`${index}-${condition.key}`}>
+                  {condition.label}:{condition.value}
+                </p>
+              ))}
+            </Fragment>
           ))}
       </div>
-      {conditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
+      {currentConditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
 
       {/* 名前・スプライト */}
       <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
@@ -143,11 +146,14 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
                       {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={path.to.name} />}
                       <span>{path.to.name}</span>
                     </button>
-                    {formatEvolutionConditions(path.evoDetails).map((condition) => (
-                      <p key={condition.key}>
-                        {condition.label}: {condition.value}
-                      </p>
-                    ))}
+                    {currentConditions !== null &&
+                      currentConditions.map((conditions, index) =>
+                        formatEvolutionConditions(conditions).map((condition) => (
+                          <span key={`${index}-${condition.key}`}>
+                            {condition.label}:{condition.value}
+                          </span>
+                        )),
+                      )}
                   </li>
                 );
               })}
