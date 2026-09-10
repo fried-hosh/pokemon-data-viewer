@@ -336,7 +336,17 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
 
     return getDefaultPokemon(defaultSpeciesData);
   };
-
+  /**
+   * フォルムポケモンなら base_form / evolved_formのpokemon URLをそのまま使う。
+   * 原種ポケモンではnullになるため、speciesからpokemonを取得 -> default(原種)データを取得。
+   *
+   * 取得したnameはフォルム別の進化経路判定に、
+   * urlは進化表のアートワーク取得に使う。
+   *
+   * @param form base_form / evolved_form のPokemon情報
+   * @param speciesUrl 原種ポケモンのPokemon情報に辿り着くためのspecies URL
+   * @returns Pokemonの{name, url}。原種の補完に失敗した場合はnull
+   */
   const resolvePokemonReference = async (form: FormInfo, speciesUrl: string) => {
     if (form !== null) {
       return form;
@@ -374,71 +384,90 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     };
   };
 
-  const evolutionPaths: EvolutionPath[] = [];
-
   // 進化チェーンから全ポケモン名を再帰取得
-  const getEvolutionItems = async (node: EvolutionNode): Promise<void> => {
-    for (const nextNode of node.evolves_to) {
-      for (const detail of nextNode.evolution_details) {
-        // メインシリーズ以外の進化条件(evolution_details)を省く
-        if (!detail.is_default) {
-          continue;
-        }
+  const getEvolutionItems = async (node: EvolutionNode): Promise<EvolutionPath[]> => {
+    // nodeから直接進化する各分岐を並列処理し、すべての完了を待つ
+    const results = await Promise.all(
+      node.evolves_to.map(async (nextNode) => {
+        const currentPath: EvolutionPath[] = [];
 
-        const fromPokemon = await resolvePokemonReference(detail.base_form, node.species.url);
-        const toPokemon = await resolvePokemonReference(detail.evolved_form, nextNode.species.url);
+        for (const detail of nextNode.evolution_details) {
+          // メインシリーズ以外の進化条件(evolution_details)を省く
+          if (!detail.is_default) {
+            continue;
+          }
 
-        // 原種のvarieties isDefault取得に失敗した場合
-        if (fromPokemon === null || toPokemon === null) {
-          continue;
-        }
+          // 進化元と進化先を並列取得
+          const [fromPokemon, toPokemon] = await Promise.all([resolvePokemonReference(detail.base_form, node.species.url), resolvePokemonReference(detail.evolved_form, nextNode.species.url)]);
 
-        const conditions: EvolutionConditions = {
-          item: await getLocalizedResource(detail.item),
-          heldItem: await getLocalizedResource(detail.held_item),
-          knownMove: await getLocalizedResource(detail.known_move),
-          knownMoveType: await getLocalizedResource(detail.known_move_type),
-          location: await getLocalizedResource(detail.location),
-          partySpecies: await getLocalizedResource(detail.party_species),
-          partyType: await getLocalizedResource(detail.party_type),
-          region: await getLocalizedResource(detail.region),
-          tradeSpecies: await getLocalizedResource(detail.trade_species),
-          usedMove: await getLocalizedResource(detail.used_move),
-          trigger: detail.trigger,
-          gender: detail.gender,
-          minAffection: detail.min_affection,
-          minBeauty: detail.min_beauty,
-          minDamageTaken: detail.min_damage_taken,
-          minHappiness: detail.min_happiness,
-          minLevel: detail.min_level,
-          minMoveCount: detail.min_move_count,
-          minSteps: detail.min_steps,
-          relativePhysicalStats: detail.relative_physical_stats,
-          nearSpecialRock: detail.near_special_rock,
-          needsMultiplayer: detail.needs_multiplayer,
-          needsOverworldRain: detail.needs_overworld_rain,
-          turnUpsideDown: detail.turn_upside_down,
-          timeOfDay: detail.time_of_day,
-        };
-        // 今回のfrom,toが既存のパスのfrom,toと一致するかを調べる
-        // ヤバチャ系は条件だけが異なる同名from,toを持つパスが複数返ってくるため、一致した場合は条件文だけをpushしたい
-        const existingPath = evolutionPaths.find((path) => path.from.name === fromPokemon.name && path.to.name === toPokemon.name);
-        if (existingPath) {
-          existingPath.evoDetails.push(conditions);
-        } else {
-          // 大多数のポケモン or ヤバチャ系一周目
-          evolutionPaths.push({
-            from: fromPokemon,
-            to: toPokemon,
-            evoDetails: [conditions],
-          });
+          // 原種のvarieties isDefault取得に失敗した場合
+          if (fromPokemon === null || toPokemon === null) {
+            continue;
+          }
+
+          // 日本語化対象の進化条件を並列取得
+          const [item, heldItem, knownMove, knownMoveType, location, partySpecies, partyType, region, tradeSpecies, usedMove] = await Promise.all([
+            getLocalizedResource(detail.item),
+            getLocalizedResource(detail.held_item),
+            getLocalizedResource(detail.known_move),
+            getLocalizedResource(detail.known_move_type),
+            getLocalizedResource(detail.location),
+            getLocalizedResource(detail.party_species),
+            getLocalizedResource(detail.party_type),
+            getLocalizedResource(detail.region),
+            getLocalizedResource(detail.trade_species),
+            getLocalizedResource(detail.used_move),
+          ]);
+
+          const conditions: EvolutionConditions = {
+            item,
+            heldItem,
+            knownMove,
+            knownMoveType,
+            location,
+            partySpecies,
+            partyType,
+            region,
+            tradeSpecies,
+            usedMove,
+            trigger: detail.trigger,
+            gender: detail.gender,
+            minAffection: detail.min_affection,
+            minBeauty: detail.min_beauty,
+            minDamageTaken: detail.min_damage_taken,
+            minHappiness: detail.min_happiness,
+            minLevel: detail.min_level,
+            minMoveCount: detail.min_move_count,
+            minSteps: detail.min_steps,
+            relativePhysicalStats: detail.relative_physical_stats,
+            nearSpecialRock: detail.near_special_rock,
+            needsMultiplayer: detail.needs_multiplayer,
+            needsOverworldRain: detail.needs_overworld_rain,
+            turnUpsideDown: detail.turn_upside_down,
+            timeOfDay: detail.time_of_day,
+          };
+          // 今回のfrom,toが既存のパスのfrom,toと一致するかを調べる
+          // ヤバチャ系は条件だけが異なる同名from,toを持つパスが複数返ってくるため、一致した場合は条件文だけをpushしたい
+          const existingPath = currentPath.find((path) => path.from.name === fromPokemon.name && path.to.name === toPokemon.name);
+          if (existingPath) {
+            existingPath.evoDetails.push(conditions);
+          } else {
+            // 大多数のポケモン or ヤバチャ系一周目
+            currentPath.push({
+              from: fromPokemon,
+              to: toPokemon,
+              evoDetails: [conditions],
+            });
+          }
         }
-      }
-      await getEvolutionItems(nextNode);
-    }
+        const nextPaths = await getEvolutionItems(nextNode);
+        return [...currentPath, ...nextPaths];
+      }),
+    );
+    return results.flat();
   };
 
-  await getEvolutionItems(evolutionData.chain);
+  const evolutionPaths = await getEvolutionItems(evolutionData.chain);
 
   // 作成したevolutionPathsの中から選択中のフォルムに関連するチェーンを絞り込む
   // 原種ニャースを検索した場合、アローラ、ガラルのフォルムを省く
