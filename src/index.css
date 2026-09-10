@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer base {
+  html:has(dialog:modal) {
+    overflow: hidden;
+  }
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -26,6 +32,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  /* 進化線の色 */
+  --normal-evolution-line: var(--color-slate-400);
+  --selected-evolution-line: var(--color-emerald-500);
+
   @media (max-width: 1024px) {
     font-size: 16px;
   }
@@ -43,6 +53,8 @@
     --accent-border: rgba(192, 132, 252, 0.5);
     --social-bg: rgba(47, 48, 58, 0.5);
     --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+    /* 進化線の色 */
+    --selected-evolution-line: var(--color-amber-300);
   }
 
   #social .button-icon {
@@ -108,4 +120,57 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+/* ========================================
+   MobileEvolutionBranch.tsx - モバイル版進化表の分岐線レイアウト
+======================================== */
+.mobile-evolution-branches > li {
+  position: relative;
+}
+/* liの最後の要素以外 */
+.mobile-evolution-branches > li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* 根本ポケモン画像のsizeが18、中央が9、かつ子がml-17。 17-9=8=32px=2rem で根本画像の中心に辿り着けるため */
+  left: -2rem;
+  width: 2px;
+  background-color: var(--normal-evolution-line);
+}
+/* throughの縦線だけ色を上書きする */
+.mobile-evolution-branches > li.connector-through::before {
+  z-index: 1;
+  background-color: var(--selected-evolution-line);
+}
+.mobile-evolution-branches > li > div {
+  position: relative;
+}
+.mobile-evolution-branches > li:last-child > div::before,
+.mobile-evolution-branches > li.connector-target > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 50%;
+  left: -2rem;
+  width: 2px;
+  background-color: var(--normal-evolution-line);
+}
+/* 横線(名前・画像・進化条件を持つdivを対象に50％位置を指定) */
+.mobile-evolution-branches > li > div::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -2rem;
+  width: 2rem;
+  height: 2px;
+  background-color: var(--normal-evolution-line);
+}
+/* targetの横線と縦線を着色 */
+.mobile-evolution-branches > li.connector-target > div::before {
+  background-color: var(--selected-evolution-line);
+}
+.mobile-evolution-branches > li.connector-target > div::after {
+  background-color: var(--selected-evolution-line);
 }
