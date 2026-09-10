@@ -146,14 +146,13 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
                       {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={path.to.name} />}
                       <span>{path.to.name}</span>
                     </button>
-                    {currentConditions !== null &&
-                      currentConditions.map((conditions, index) =>
-                        formatEvolutionConditions(conditions).map((condition) => (
-                          <span key={`${index}-${condition.key}`}>
-                            {condition.label}:{condition.value}
-                          </span>
-                        )),
-                      )}
+                    {path.evoDetails.map((conditions, index) =>
+                      formatEvolutionConditions(conditions).map((condition) => (
+                        <span key={`${index}-${condition.key}`}>
+                          {condition.label}:{condition.value}
+                        </span>
+                      )),
+                    )}
                   </li>
                 );
               })}
