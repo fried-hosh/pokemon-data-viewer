@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { type PokemonDetails } from "../api/getPokemonDetails";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
 import PokemonEvolutionPanel from "./PokemonEvolutionPanel";
+import PokemonTypeEffectivenessPanel from "./PokemonTypeEffectivenessPanel";
 
 type Props = {
   details: PokemonDetails;
@@ -109,9 +110,7 @@ const PokemonDetailList = ({ details }: Props) => {
         </section>
 
         {/* タイプ相性 */}
-        <section className={`${panelClassName} flex-1`}>
-          <h2>タイプ相性</h2>
-        </section>
+        <PokemonTypeEffectivenessPanel typeEffectiveness={details.typeEffectiveness} panelClassName={panelClassName} />
       </div>
 
       {/* 進化チェーン */}
