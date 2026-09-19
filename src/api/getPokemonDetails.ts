@@ -95,9 +95,14 @@ const NamedApiResourceSchema = z.object({
   url: z.string(),
 });
 
+// 新しく追加されたフォルム情報
+const PokemonFormSchema = z.object({
+  pokemon: NamedApiResourceSchema,
+});
+
 const EvolutionDetailSchema = z.object({
-  base_form: NamedApiResourceSchema.nullable(),
-  evolved_form: NamedApiResourceSchema.nullable(),
+  required_pokemon_form: NamedApiResourceSchema.nullable(),
+  evolved_pokemon_form: NamedApiResourceSchema.nullable(),
   item: NamedApiResourceSchema.nullable(),
   held_item: NamedApiResourceSchema.nullable(),
   known_move: NamedApiResourceSchema.nullable(),
@@ -350,14 +355,40 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
 
     return getDefaultPokemon(defaultSpeciesData);
   };
+
   /**
-   * フォルムポケモンなら base_form / evolved_formのpokemon URLをそのまま使う。
+   * PokemonFormを取得・検証し、その中のpokemonの名前とURLを返す。
+   *
+   * @param formUrl フォーム情報の取得先URL
+   * @returns ポケモンのnameと取得先URL
+   */
+  const getPokemonreferenceFromForm = async (formUrl: string | undefined): Promise<PokemonReference | null> => {
+    if (formUrl === undefined) {
+      return null;
+    }
+
+    const formRes = await fetch(formUrl);
+    if (!formRes.ok) {
+      throw new Error(`formの取得失敗: ${formRes.status}`);
+    }
+    const rawFormRes: unknown = await formRes.json();
+    const formResult = PokemonFormSchema.safeParse(rawFormRes);
+    if (!formResult.success) {
+      console.error(formResult.error);
+      throw new Error("formレスポンスの形式が想定と異なります");
+    }
+    const formData = formResult.data;
+    return formData.pokemon;
+  };
+
+  /**
+   * フォルムポケモンならformのURLをそのまま使う。
    * 原種ポケモンではnullになるため、speciesからpokemonを取得 -> default(原種)データを取得。
    *
    * 取得したnameはフォルム別の進化経路判定に、
    * urlは進化表のアートワーク取得に使う。
    *
-   * @param form base_form / evolved_form のPokemon情報
+   * @param form ポケモンの名前と取得先URL。フォーム指定がない場合はnull
    * @param speciesUrl 原種ポケモンのPokemon情報に辿り着くためのspecies URL
    * @returns Pokemonの{name, url}。原種の補完に失敗した場合はnull
    */
@@ -411,8 +442,13 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
             continue;
           }
 
+          // フォルムの取得先を取り出す
+          const requiredFormUrl = detail.required_pokemon_form?.url;
+          const evolvedFormUrl = detail.evolved_pokemon_form?.url;
+          const [requiredForm, evolvedForm] = await Promise.all([getPokemonreferenceFromForm(requiredFormUrl), getPokemonreferenceFromForm(evolvedFormUrl)]);
+
           // 進化元と進化先を並列取得
-          const [fromPokemon, toPokemon] = await Promise.all([resolvePokemonReference(detail.base_form, node.species.url), resolvePokemonReference(detail.evolved_form, nextNode.species.url)]);
+          const [fromPokemon, toPokemon] = await Promise.all([resolvePokemonReference(requiredForm, node.species.url), resolvePokemonReference(evolvedForm, nextNode.species.url)]);
 
           // 原種のvarieties isDefault取得に失敗した場合
           if (fromPokemon === null || toPokemon === null) {
