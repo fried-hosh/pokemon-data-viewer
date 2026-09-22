@@ -3,6 +3,7 @@ import { type PokemonDetails } from "../api/getPokemonDetails";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
 import PokemonEvolutionPanel from "./PokemonEvolutionPanel";
 import PokemonTypeEffectivenessPanel from "./PokemonTypeEffectivenessPanel";
+import PokemonMovesPanel from "./PokemonMovesPanel";
 
 type Props = {
   details: PokemonDetails;
@@ -117,9 +118,7 @@ const PokemonDetailList = ({ details }: Props) => {
       <PokemonEvolutionPanel details={details} panelClassName={`${panelClassName} lg:col-span-2`} mobileDialogRef={evolutionDialogRef} />
 
       {/* 覚える技 */}
-      <section className={panelClassName}>
-        <h2>覚える技</h2>
-      </section>
+      <PokemonMovesPanel pokemonMoves={details.pokemonMoves} panelClassName={panelClassName} />
     </div>
   );
 };
