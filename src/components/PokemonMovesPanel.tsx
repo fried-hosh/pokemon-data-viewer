@@ -65,26 +65,6 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
       return a.level - b.level;
     });
   }
-  // チャンピオンズの技をタイプ順かつ威力昇順に変更
-  const championsMoves = accumulatedMoves["train"];
-  if (displayVersionName === "champions" && championsMoves !== undefined) {
-    championsMoves.sort((a, b) => {
-      const typeComparison = a.type.localeCompare(b.type);
-      if (typeComparison !== 0) {
-        return typeComparison;
-      }
-      if (a.power === null && b.power === null) {
-        return 0;
-      }
-      if (a.power === null) {
-        return 1;
-      }
-      if (b.power === null) {
-        return -1;
-      }
-      return a.power - b.power;
-    });
-  }
 
   const accumulatedMovesArray = Object.entries(accumulatedMoves);
 

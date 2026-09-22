@@ -119,8 +119,8 @@ export const getPokemonMoves = async (pokemonMoves: PokemonMoveData): Promise<Po
   }
   const oldestVersionGroupData = oldestVersionGroupResult.data;
 
-  // 当該ポケモンの作品情報をUSUM以降に限定する
-  const supportedVersionGroups = versionGroupsByNewest.filter((versionGroup) => versionGroup.order >= oldestVersionGroupData.order);
+  // 当該ポケモンの作品情報をUSUM以降に限定する / チャンピオンズを除外
+  const supportedVersionGroups = versionGroupsByNewest.filter((versionGroup) => versionGroup.order >= oldestVersionGroupData.order && versionGroup.name !== "champions");
 
   // 今回表示する作品名を最新の1つに特定
   const targetVersionGroupName = supportedVersionGroups[0]?.name;
