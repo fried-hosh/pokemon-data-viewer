@@ -119,11 +119,11 @@ export const getPokemonMoves = async (pokemonMoves: PokemonMoveData): Promise<Po
   }
   const oldestVersionGroupData = oldestVersionGroupResult.data;
 
-  // 当該ポケモンの作品情報をUSUM以降に限定する / チャンピオンズを除外
-  const supportedVersionGroups = versionGroupsByNewest.filter((versionGroup) => versionGroup.order >= oldestVersionGroupData.order && versionGroup.name !== "champions");
+  // 当該ポケモンの作品情報をUSUM以降に限定する
+  const supportedVersionGroups = versionGroupsByNewest.filter((versionGroup) => versionGroup.order >= oldestVersionGroupData.order);
 
-  // 今回表示する作品名を最新の1つに特定
-  const targetVersionGroupName = supportedVersionGroups[0]?.name;
+  // 今回表示する作品名を最新の1つに特定 / 通常作品を優先し、なければチャンピオンズを使用
+  const targetVersionGroupName = supportedVersionGroups.find((versionGroup) => versionGroup.name !== "champions")?.name ?? supportedVersionGroups.find((versionGroup) => versionGroup.name === "champions")?.name;
 
   if (targetVersionGroupName === undefined) {
     return [];
