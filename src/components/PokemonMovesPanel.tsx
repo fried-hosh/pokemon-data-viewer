@@ -133,7 +133,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
             </h3>
             {moves.map((move) => (
               <div
-                key={move.id}
+                key={`${move.id}-${move.level ?? "no-level"}`}
                 className="
                 p-2 mb-2 shadow-sm border
                 border-slate-400/70 bg-amber-100/40
