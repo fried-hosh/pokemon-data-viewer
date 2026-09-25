@@ -3,12 +3,17 @@ import { type PokemonDetails } from "../api/getPokemonDetails";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
 import PokemonEvolutionPanel from "./PokemonEvolutionPanel";
 import PokemonTypeEffectivenessPanel from "./PokemonTypeEffectivenessPanel";
+import PokemonMovesPanel from "./PokemonMovesPanel";
+import type { PokemonMoveItem } from "../api/getPokemonMoves";
 
 type Props = {
   details: PokemonDetails;
+  moves: PokemonMoveItem[] | undefined;
+  isMovesLoading: boolean;
+  isMovesError: boolean;
 };
 
-const PokemonDetailList = ({ details }: Props) => {
+const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Props) => {
   // 合計種族値
   const totalStats = details.stats
     .map((stat) => stat.baseStat)
@@ -117,9 +122,9 @@ const PokemonDetailList = ({ details }: Props) => {
       <PokemonEvolutionPanel details={details} panelClassName={`${panelClassName} lg:col-span-2`} mobileDialogRef={evolutionDialogRef} />
 
       {/* 覚える技 */}
-      <section className={panelClassName}>
-        <h2>覚える技</h2>
-      </section>
+      {isMovesLoading && <p>技データを読み込み中...</p>}
+      {isMovesError && <p className="text-red-200">技の取得に失敗しました</p>}
+      {moves && <PokemonMovesPanel pokemonMoves={moves} panelClassName={panelClassName} />}
     </div>
   );
 };

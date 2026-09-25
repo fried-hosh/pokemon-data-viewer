@@ -6,6 +6,7 @@ import { z } from "zod";
 import { type PokemonType } from "../lib/pokemonTypeMap";
 import { PokemonTypeSchema } from "../lib/pokemonTypeMap";
 import { getTypeEffectiveness, type TypeEffectivenessGroup } from "./getTypeEffectiveness";
+import { PokemonMoveSchema, type PokemonMoveData } from "./getPokemonMoves";
 
 /* ========================================
    スキーマ
@@ -51,6 +52,7 @@ const PokemonSchema = z.object({
       }),
     }),
   }),
+  moves: z.array(PokemonMoveSchema),
 });
 
 const AbilitySchema = z.object({
@@ -188,6 +190,7 @@ export type PokemonDetails = {
   evolutionPaths: EvolutionPath[];
   evolutionArtworks: EvolutionArtwork[];
   typeEffectiveness: TypeEffectivenessGroup[] | null;
+  pokemonMoves: PokemonMoveData;
 };
 
 type NamedApiResourceWithJa = {
@@ -613,5 +616,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     evolutionPaths: selectedEvolutionPathArray,
     evolutionArtworks: evolutionArtworks,
     typeEffectiveness,
+    pokemonMoves: pokemonData.moves,
   };
 };
