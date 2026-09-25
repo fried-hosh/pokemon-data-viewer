@@ -31,7 +31,7 @@ const versionGroupMap: Record<string, string> = {
 };
 
 type PokemonMovesPanelProps = {
-  pokemonMoves: PokemonMoveItem[] | null;
+  pokemonMoves: PokemonMoveItem[];
   panelClassName: string;
 };
 
@@ -40,15 +40,14 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
 
   // 技一覧を習得方法ごとに集約
   const accumulatedMoves: Record<string, PokemonMoveItem[]> = {};
-  if (pokemonMoves !== null) {
-    for (const move of pokemonMoves) {
-      if (!Object.hasOwn(accumulatedMoves, move.learnMethod)) {
-        accumulatedMoves[move.learnMethod] = [move];
-      } else {
-        accumulatedMoves[move.learnMethod]?.push(move);
-      }
+  for (const move of pokemonMoves) {
+    if (!Object.hasOwn(accumulatedMoves, move.learnMethod)) {
+      accumulatedMoves[move.learnMethod] = [move];
+    } else {
+      accumulatedMoves[move.learnMethod]?.push(move);
     }
   }
+
   // "level-up" のレベルを昇順に変更
   const levelUpMoves = accumulatedMoves["level-up"];
   if (levelUpMoves !== undefined) {
@@ -111,7 +110,6 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
       {/* タイトル 対象作品名 */}
       <div className="mb-3 flex justify-between items-center  border-slate-400">
         <h2>覚える技</h2>
-        {pokemonMoves === null && <p className="text-red-200">技情報を取得できませんでした</p>}
         {displayVersionName !== undefined && <span className="font-bold">{`${versionGroupMap[displayVersionName] ?? displayVersionName}`}</span>}
       </div>
 
