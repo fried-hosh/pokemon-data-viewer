@@ -66,9 +66,15 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
     });
   }
   // チャンピオンズの技をタイプ順かつ威力昇順に変更
-  const championsMoves = accumulatedMoves["train"];
-  if (displayVersionName === "champions" && championsMoves !== undefined) {
-    championsMoves.sort((a, b) => {
+  const movesToSort = [accumulatedMoves["machine"]];
+  if (displayVersionName === "champions") {
+    movesToSort.push(accumulatedMoves["train"]);
+  }
+  for (const moves of movesToSort) {
+    if (moves === undefined) {
+      continue;
+    }
+    moves.sort((a, b) => {
       const typeComparison = a.type.localeCompare(b.type);
       if (typeComparison !== 0) {
         return typeComparison;
@@ -152,9 +158,9 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
                 <div className="flex justify-between">
                   <span>{damageClassMap[move.damageClass]}</span>
                   <div className="flex gap-3">
-                    <span>威力 {move.power ?? "-"}</span>
-                    <span>命中 {move.accuracy ?? "-"}</span>
-                    <span>PP {move.pp ?? "-"}</span>
+                    <span>威力 {move.power || "-"}</span>
+                    <span>命中 {move.accuracy || "-"}</span>
+                    <span>PP {move.pp || "-"}</span>
                   </div>
                 </div>
               </div>
