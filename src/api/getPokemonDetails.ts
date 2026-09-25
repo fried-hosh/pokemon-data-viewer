@@ -6,7 +6,7 @@ import { z } from "zod";
 import { type PokemonType } from "../lib/pokemonTypeMap";
 import { PokemonTypeSchema } from "../lib/pokemonTypeMap";
 import { getTypeEffectiveness, type TypeEffectivenessGroup } from "./getTypeEffectiveness";
-import { getPokemonMoves, PokemonMoveSchema, type PokemonMoveItem } from "./getPokemonMoves";
+import { PokemonMoveSchema, type PokemonMoveData } from "./getPokemonMoves";
 
 /* ========================================
    スキーマ
@@ -190,7 +190,7 @@ export type PokemonDetails = {
   evolutionPaths: EvolutionPath[];
   evolutionArtworks: EvolutionArtwork[];
   typeEffectiveness: TypeEffectivenessGroup[] | null;
-  pokemonMoves: PokemonMoveItem[] | null;
+  pokemonMoves: PokemonMoveData;
 };
 
 type NamedApiResourceWithJa = {
@@ -331,14 +331,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
   } catch (error) {
     // 失敗した場合はnullのまま詳細画面の取得を続ける
     console.error("タイプ相性の取得に失敗しました", error);
-  }
-
-  // 技データ取得
-  let pokemonMoves: PokemonMoveItem[] | null = null;
-  try {
-    pokemonMoves = await getPokemonMoves(pokemonData.moves);
-  } catch (error) {
-    console.error("技の取得に失敗しました", error);
   }
 
   /* ========================================
@@ -624,6 +616,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     evolutionPaths: selectedEvolutionPathArray,
     evolutionArtworks: evolutionArtworks,
     typeEffectiveness,
-    pokemonMoves,
+    pokemonMoves: pokemonData.moves,
   };
 };

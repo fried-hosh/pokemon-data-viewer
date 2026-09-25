@@ -74,7 +74,7 @@ export type PokemonMoveItem = {
   learnMethod: string;
 };
 
-type PokemonMoveData = z.infer<typeof PokemonMoveSchema>[];
+export type PokemonMoveData = z.infer<typeof PokemonMoveSchema>[];
 
 /* ========================================
    データ取得 / 作品選択
@@ -130,7 +130,7 @@ export const getPokemonMoves = async (pokemonMoves: PokemonMoveData): Promise<Po
   }
 
   /* ========================================
-   技データ整形 / 返り値用データ取得
+   技データ整形
 ======================================== */
 
   // 当該ポケモンの技リストをtargetVersionGroupNameを含むもののみに限定
