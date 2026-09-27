@@ -12,7 +12,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
   // 検索候補
   const [isSuggestOpen, setIsSuggestOpen] = useState<boolean>(true);
 
-  // 変換確定前に候補選択後した場合のモバイルIME動作不具合解消
+  // 変換確定前に候補を選択した場合のモバイルIME動作不具合解消
   const inputRef = useRef<HTMLInputElement>(null);
   const pointerTypeRef = useRef<string>("mouse");
 
