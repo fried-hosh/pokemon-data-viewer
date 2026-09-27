@@ -22,8 +22,11 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
     if (trimmedName === "") {
       return;
     }
+    // 検索失敗時
     if (!Object.hasOwn(pokemonSearchMap, trimmedName)) {
       setIsSuggestOpen(true);
+      // フォーカスをinputに戻してonBlurが効くようにする
+      inputRef.current?.focus();
       return;
     }
 
