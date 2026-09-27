@@ -40,6 +40,19 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
       ? []
       : Object.keys(pokemonSearchMap)
           .filter((name) => normalizeSearchText(name).includes(normalizedInput))
+          .sort((a, b) => {
+            // ろ -> ロコン よりも前にウォッシュロトム などが表示されてしまう不具合を解消
+            const aStarts = normalizeSearchText(a).startsWith(normalizedInput);
+            const bStarts = normalizeSearchText(b).startsWith(normalizedInput);
+            // aに入力の先頭が含まれていてbが含まれていないならaを前にする(-1)
+            if (aStarts && !bStarts) {
+              return -1;
+            }
+            if (!aStarts && bStarts) {
+              return 1;
+            }
+            return 0;
+          })
           .slice(0, 10);
 
   return (
