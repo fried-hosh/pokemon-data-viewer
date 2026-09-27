@@ -45,7 +45,15 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
   return (
     <div>
       <form className="flex gap-2 p-6 mx-auto max-w-xl" onSubmit={handleSubmit}>
-        <div className="relative flex-1">
+        <div
+          className="relative flex-1"
+          onBlur={(event) => {
+            if (event.currentTarget.contains(event.relatedTarget)) {
+              return;
+            }
+            setIsSuggestOpen(false);
+          }}
+        >
           <input
             ref={inputRef}
             className=" w-full rounded-xl border border-amber-300 bg-white px-4 py-3 text-black shadow-sm focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition"
@@ -55,7 +63,6 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
               setInputName(event.currentTarget.value);
               setIsSuggestOpen(true);
             }}
-            onBlur={() => setIsSuggestOpen(false)}
           />
 
           {/* 検索候補 */}
@@ -107,6 +114,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
           )}
         </div>
 
+        {/* 検索ボタン */}
         <button
           className="font-bold text-white px-5 py-3 rounded-xl border border-amber-500 bg-amber-500
           text-lg leading-none
