@@ -22,8 +22,12 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
     if (trimmedName === "") {
       return;
     }
+    // りざーどん(ひらがな) ポリゴンZ(全角) 等の入力から送信できるようにする
+    const normalizedName = normalizeSearchText(trimmedName);
+    const matchedName = Object.keys(pokemonSearchMap).find((name) => normalizeSearchText(name) === normalizedName);
+
     // 検索失敗時
-    if (!Object.hasOwn(pokemonSearchMap, trimmedName)) {
+    if (!matchedName) {
       setIsSuggestOpen(true);
       // フォーカスをinputに戻してonBlurが効くようにする
       inputRef.current?.focus();
@@ -32,7 +36,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
 
     setInputName("");
     setIsSuggestOpen(false);
-    onSearch(trimmedName);
+    onSearch(matchedName);
   };
 
   // ローマ字入力の変換途中（「りz」など）でも候補が消えないよう、末尾のアルファベットを除いて絞り込む
