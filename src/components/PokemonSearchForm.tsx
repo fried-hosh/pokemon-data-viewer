@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { pokemonSearchMap } from "../lib/pokemonSearchMap";
 import { normalizeSearchText } from "../lib/normalizeSearchText";
+import { flushSync } from "react-dom";
 
 type Props = {
   onSearch: (name: string) => void;
@@ -10,6 +11,10 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
   const [inputName, setInputName] = useState("");
   // 検索候補
   const [isSuggestOpen, setIsSuggestOpen] = useState<boolean>(true);
+
+  // 変換確定前に候補選択後した場合のモバイルIME動作不具合解消
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pointerTypeRef = useRef<string>("mouse");
 
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,6 +47,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
       <form className="flex gap-2 p-6 mx-auto max-w-xl" onSubmit={handleSubmit}>
         <div className="relative flex-1">
           <input
+            ref={inputRef}
             className=" w-full rounded-xl border border-amber-300 bg-white px-4 py-3 text-black shadow-sm focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition"
             type="text"
             value={inputName}
@@ -74,9 +80,22 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
                     transition-colors
                     "
                     type="button"
+                    // 押下された瞬間のイベントを拾う
+                    onPointerDown={(event) => {
+                      pointerTypeRef.current = event.pointerType;
+                    }}
+                    // 押下を離した瞬間
                     onClick={() => {
-                      setInputName(name);
-                      setIsSuggestOpen(false);
+                      inputRef.current?.blur();
+                      // windowsでの動作を確認できないためflushSyncを残す
+                      flushSync(() => {
+                        setInputName(name);
+                        setIsSuggestOpen(false);
+                      });
+                      // モバイルはblurのまま / PCはfocus
+                      if (pointerTypeRef.current === "mouse") {
+                        inputRef.current?.focus();
+                      }
                     }}
                     onMouseDown={(event) => event.preventDefault()}
                   >
