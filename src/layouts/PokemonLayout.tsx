@@ -14,7 +14,12 @@ const PokemonLayout = () => {
 
   return (
     <div>
-      <PokemonSearchForm onSearch={handleSearch} />
+      <header className="flex items-center justify-center">
+        <button type="button" onClick={() => navigate(`/`)} className="ml-6">
+          TOP
+        </button>
+        <PokemonSearchForm onSearch={handleSearch} />
+      </header>
 
       <Outlet context={{ pokemonName: null }} />
     </div>
