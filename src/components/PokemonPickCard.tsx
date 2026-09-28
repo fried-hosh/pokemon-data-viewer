@@ -7,15 +7,25 @@ type Props = {
   apiName: string;
 };
 
+const normalCircleClassName = "from-slate-400 to-slate-100";
+const legendaryCircleClassName = "from-orange-500 via-amber-300 to-yellow-100 shadow-lg shadow-orange-500/30";
+const mythicalCircleClassName = "from-pink-300 via-violet-300 to-cyan-200 shadow-lg shadow-pink-300/60";
+
 const PokemonPickCard = ({ jaName, apiName }: Props) => {
-  // const legendaryCardClassName = "from-fuchsia-600 to-fuchsia-100";
-  // const mythicalCardClassName = "from-yellow-500 to-yellow-100";
   const { data, isPending, isError } = usePokemonCard(apiName);
   if (isPending) {
     return <p className="">読み込み中...</p>;
   }
   if (isError) {
     return <p className="text-red-200">取得失敗</p>;
+  }
+
+  let circleClassName = normalCircleClassName;
+  if (data.isLegendary) {
+    circleClassName = legendaryCircleClassName;
+  }
+  if (data.isMythical) {
+    circleClassName = mythicalCircleClassName;
   }
 
   return (
@@ -31,8 +41,8 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
       <div className="relative">
         {data.image !== null && <img src={data.image} alt={jaName} className="relative z-10 size-30 md:size-35" />}
         <span
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-12 shadow-inner rounded-full bg-linear-to-tr from-slate-400/30 to-slate-100
-        "
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-12 rounded-full bg-linear-to-tr ${circleClassName}
+        `}
         />
       </div>
       {/* 図鑑番号 名前 分類 タイプ */}
