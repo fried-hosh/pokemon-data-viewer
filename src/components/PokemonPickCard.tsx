@@ -38,6 +38,7 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
     dark:from-slate-800 dark:to-amber-50
     `}
     >
+      {/* スプライト レアリティサークル */}
       <div className="relative">
         {data.image !== null && <img src={data.image} alt={jaName} className="relative z-10 size-30 md:size-35" />}
         <span
@@ -57,7 +58,7 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
         <p>{data.genus}</p>
         <div className="flex justify-center gap-1">
           {data.types.map((type) => (
-            <span key={type} className={`${pokemonTypeMap[type].bgColorClass} rounded px-2 py-1 text-white text-xs md:text-base whitespace-nowrap`}>
+            <span key={type} className={`${pokemonTypeMap[type].bgColorClass} font-bold  rounded px-2 py-1 text-white text-xs md:text-base whitespace-nowrap`}>
               {pokemonTypeMap[type].ja}
             </span>
           ))}

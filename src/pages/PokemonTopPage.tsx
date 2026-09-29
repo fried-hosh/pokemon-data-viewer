@@ -20,18 +20,48 @@ const randomPick = () => {
 const PokemonTopPage = () => {
   const [picks, setPicks] = useState(() => randomPick());
   return (
-    <div>
-      <button type="button" onClick={() => setPicks(randomPick())}>
-        引き直す
-      </button>
-      <ul className="flex flex-col md:flex-row justify-center w-full max-w-3xl mx-auto px-8 gap-2">
-        {picks.map(([jaName, apiName]) => (
-          <li key={apiName} className="flex-1 ">
-            <PokemonPickCard jaName={jaName} apiName={apiName} />
-          </li>
-        ))}
-      </ul>
-    </div>
+    <section className={`relative w-full max-w-3xl mx-auto mt-4 pt-8 pb-6 px-8 border rounded-2xl shadow-lg border-(--border) bg-(--code-bg)`}>
+      {/* タイトル*/}
+      <h3
+        className={`
+        absolute z-10 -top-4.5 left-8
+        font-semibold text-pink-400 dark:text-amber-200 p-2 tracking-widest
+        border rounded-full border-(--border) bg-(--code-bg)
+        `}
+      >
+        PICK UP
+      </h3>
+      {/* カード */}
+      <div className="flex flex-col gap-2">
+        <ul className="flex flex-col md:flex-row justify-center gap-2">
+          {picks.map(([jaName, apiName]) => (
+            <li key={apiName} className="flex-1 ">
+              <PokemonPickCard jaName={jaName} apiName={apiName} />
+            </li>
+          ))}
+        </ul>
+        {/* 引き直しボタン */}
+        <button
+          type="button"
+          onClick={() => setPicks(randomPick())}
+          className="group
+        font-semibold text-slate-700 dark:text-slate-200 p-2 mt-2 self-center
+        border-3 rounded-full border-amber-100/60 dark:border-(--border) shadow-md
+        transition hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:scale-90
+        "
+        >
+          <span
+            className="
+        text-pink-400 font-bold mr-1
+        inline-block group-hover:rotate-360 transition-transform duration-300
+        "
+          >
+            ↻
+          </span>
+          もういちど 引く
+        </button>
+      </div>
+    </section>
   );
 };
 

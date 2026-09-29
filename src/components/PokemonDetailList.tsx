@@ -22,7 +22,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
     }, 0);
 
   // パネルの共通レイアウト
-  const panelClassName = "p-5 rounded-2xl border text-left shadow-lg border-[var(--border)] bg-[var(--code-bg)]";
+  const panelClassName = "p-5 rounded-2xl border text-left shadow-lg border-(--border) bg-(--code-bg)";
   // 種族値ゲージの上限値
   const MAX_BASE_STAT = 255;
 
