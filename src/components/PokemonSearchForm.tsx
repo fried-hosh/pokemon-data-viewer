@@ -90,7 +90,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
           {normalizedInput !== "" && isSuggestOpen && (
             <ul
               className="
-            absolute z-10 top-full left-0 min-w-auto flex flex-col gap-0.5 mt-1 p-1.5 shadow-md
+            absolute z-50 top-full left-0 min-w-auto flex flex-col gap-0.5 mt-1 p-1.5 shadow-md
             border rounded-xl border-amber-300 dark:border-slate-400
             bg-amber-100/80 dark:bg-slate-900/80
             "
