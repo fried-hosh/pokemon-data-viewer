@@ -49,16 +49,16 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
       {/* 図鑑番号 名前 分類 タイプ */}
       <div
         className="
-      flex flex-col gap-0.5 flex-1 justify-center
+      flex flex-col gap-0.5 flex-1
       dark:text-slate-800
       "
       >
         <p className="text-sm">全国図鑑No.{data.dexNumber}</p>
-        <p className="font-bold text-slate-900 dark:text-slate-900">{jaName}</p>
+        <p className="flex items-center justify-center font-bold text-slate-900 dark:text-slate-900 md:min-h-[2lh]">{jaName}</p>
         <p>{data.genus}</p>
         <div className="flex justify-center gap-1">
           {data.types.map((type) => (
-            <span key={type} className={`${pokemonTypeMap[type].bgColorClass} font-bold  rounded px-2 py-1 text-white text-xs md:text-base whitespace-nowrap`}>
+            <span key={type} className={`${pokemonTypeMap[type].bgColorClass} font-bold rounded px-2 py-1 text-white text-xs md:text-base whitespace-nowrap`}>
               {pokemonTypeMap[type].ja}
             </span>
           ))}
