@@ -16,6 +16,8 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
   const { data, isError } = usePokemonCard(apiName);
   // 画像の取得が成功・失敗に関わらず完了したかどうか
   const [isImgSettled, setIsImgSettled] = useState(false);
+  // カードが配られ終えたかどうか
+  const [isDealt, setIsDealt] = useState(false);
 
   // 画像を読み込み終えたか、画像がないときに表面を見せる
   const isFrontReady = isImgSettled || data?.image === null;
@@ -33,55 +35,59 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
   }
 
   return (
-    <div className={`relative h-full transform-3d transition-transform duration-1000 ${isFrontReady ? "rotate-y-180" : ""}`}>
-      {/* カード裏面 */}
-      <div
-        className="
+    // フェードイン
+    <div className="absolute inset-0 z-10 animate-card-fade-in perspective-distant" onAnimationEnd={() => setIsDealt(true)}>
+      {/* 回転 */}
+      <div className={`relative h-full transform-3d transition-transform duration-1000 ${isFrontReady && isDealt ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""}`}>
+        {/* カード裏面 */}
+        <div
+          className="
       absolute z-30 inset-0 h-full rounded-2xl border shadow-lg border-(--border) dark:border-0 bg-linear-to-br from-amber-400 to-slate-400
       backface-hidden
       "
-      />
-      {/* 表面 */}
-      {data !== undefined && (
-        <Link
-          to={`/pokemon/${apiName}`}
-          className={`
+        />
+        {/* 表面 */}
+        {data !== undefined && (
+          <Link
+            to={`/pokemon/${apiName}`}
+            className={`
     flex md:flex-col gap-0.5 p-1 items-center h-full
     rounded-2xl border shadow-lg border-(--border) dark:border-0
     bg-linear-to-br from-sky-200 to-amber-50
     dark:from-slate-800 dark:to-amber-50
-    backface-hidden rotate-y-180
+    backface-hidden rotate-x-180 md:rotate-x-0 md:rotate-y-180
     `}
-        >
-          {/* スプライト レアリティサークル */}
-          <div className="relative">
-            {/* 画像が読み込まれてからカードを回転させることで、キャッシュ時の即時表示を防ぐ */}
-            {data.image !== null && <img src={data.image} alt={jaName} onLoad={() => setIsImgSettled(true)} onError={() => setIsImgSettled(true)} className="relative z-10 size-30 md:size-35" />}
-            <span
-              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-12 rounded-full bg-linear-to-tr ${circleClassName}
+          >
+            {/* スプライト レアリティサークル */}
+            <div className="relative">
+              {/* 画像が読み込まれてからカードを回転させることで、キャッシュ時の即時表示を防ぐ */}
+              {data.image !== null && <img src={data.image} alt={jaName} onLoad={() => setIsImgSettled(true)} onError={() => setIsImgSettled(true)} className="relative z-10 size-30 md:size-35" />}
+              <span
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-12 rounded-full bg-linear-to-tr ${circleClassName}
         `}
-            />
-          </div>
-          {/* 図鑑番号 名前 分類 タイプ */}
-          <div
-            className="
+              />
+            </div>
+            {/* 図鑑番号 名前 分類 タイプ */}
+            <div
+              className="
       flex flex-col gap-0.5 flex-1
       dark:text-slate-800
       "
-          >
-            <p className="text-sm">全国図鑑No.{data.dexNumber}</p>
-            <p className="flex items-center justify-center font-bold text-slate-900 dark:text-slate-900 md:min-h-[2lh]">{jaName}</p>
-            <p>{data.genus}</p>
-            <div className="flex justify-center gap-1">
-              {data.types.map((type) => (
-                <span key={type} className={`${pokemonTypeMap[type].bgColorClass} font-bold rounded px-2 py-1 text-white text-xs md:text-base whitespace-nowrap`}>
-                  {pokemonTypeMap[type].ja}
-                </span>
-              ))}
+            >
+              <p className="text-sm">全国図鑑No.{data.dexNumber}</p>
+              <p className="flex items-center justify-center font-bold text-slate-900 dark:text-slate-900 md:min-h-[2lh]">{jaName}</p>
+              <p>{data.genus}</p>
+              <div className="flex justify-center gap-1">
+                {data.types.map((type) => (
+                  <span key={type} className={`${pokemonTypeMap[type].bgColorClass} font-bold rounded px-2 py-1 text-white text-xs md:text-base whitespace-nowrap`}>
+                    {pokemonTypeMap[type].ja}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        </Link>
-      )}
+          </Link>
+        )}
+      </div>
     </div>
   );
 };

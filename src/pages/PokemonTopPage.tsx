@@ -20,8 +20,16 @@ const randomPick = () => {
 
 const PokemonTopPage = () => {
   const [picks, setPicks] = useState(() => randomPick());
+  // 引き直し前の3匹を記憶
+  const [prevPicks, setPrevPicks] = useState<[string, string][]>([]);
+
   const fetchingCount = useIsFetching({ queryKey: ["pokemonCard"] });
   const isFetching = fetchingCount > 0;
+
+  const handleReroll = () => {
+    setPrevPicks(picks);
+    setPicks(randomPick());
+  };
 
   return (
     <section className={`relative w-full max-w-3xl mx-auto mt-4 pt-8 pb-6 px-8 border rounded-2xl shadow-lg border-(--border) bg-(--code-bg)`}>
@@ -38,17 +46,24 @@ const PokemonTopPage = () => {
       {/* カード */}
       <div className="flex flex-col gap-2">
         <ul className="flex flex-col md:flex-row justify-center gap-2">
-          {picks.map(([jaName, apiName]) => (
-            <li key={apiName} className="md:flex-1 h-32 md:h-70 perspective-distant">
-              <PokemonPickCard jaName={jaName} apiName={apiName} />
-            </li>
-          ))}
+          {picks.map(([jaName, apiName], index) => {
+            const prevPick = prevPicks[index];
+            return (
+              // 親であるliのkeyがポケモンの名前だとほぼ毎回子ごと再描画されるため、引き直し前後で変わらないindexをkeyにする
+              <li key={index} className="relative md:flex-1 h-32 md:h-70">
+                {/* 引き直し押下後に作られる引き直し前のカード。 keyを apiName にすることで、元々あったカードと同じ要素として表示位置と状態を引き継ぐ */}
+                {prevPick !== undefined && <PokemonPickCard key={prevPick[1]} jaName={prevPick[0]} apiName={prevPick[1]} />}
+                {/* 初期表示 もしくは 新しく引いたカード。 初めて出るkeyのため新しく作られる  */}
+                <PokemonPickCard key={apiName} jaName={jaName} apiName={apiName} />
+              </li>
+            );
+          })}
         </ul>
         {/* 引き直しボタン */}
         <button
           disabled={isFetching}
           type="button"
-          onClick={() => setPicks(randomPick())}
+          onClick={() => handleReroll()}
           className="group
         font-semibold text-slate-700 dark:text-slate-200 p-2 mt-2 self-center
         border-3 rounded-full border-amber-100/30 dark:border-(--border)/30 shadow-md
