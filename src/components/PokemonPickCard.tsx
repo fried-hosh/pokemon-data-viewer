@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { usePokemonCard } from "../hooks/usePokemonCard";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
+import { useState } from "react";
 
 type Props = {
   jaName: string;
@@ -13,6 +14,11 @@ const mythicalCircleClassName = "from-pink-300 via-violet-300 to-cyan-200 shadow
 
 const PokemonPickCard = ({ jaName, apiName }: Props) => {
   const { data, isError } = usePokemonCard(apiName);
+  // 画像の取得が成功・失敗に関わらず完了したかどうか
+  const [isImgSettled, setIsImgSettled] = useState(false);
+
+  // 画像を読み込み終えたか、画像がないときに表面を見せる
+  const isFrontReady = isImgSettled || data?.image === null;
 
   if (isError) {
     return <p className="text-red-200">取得失敗</p>;
@@ -27,7 +33,7 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
   }
 
   return (
-    <div className={`relative h-full transform-3d transition-transform duration-1000 ${data !== undefined ? "rotate-y-180" : ""}`}>
+    <div className={`relative h-full transform-3d transition-transform duration-1000 ${isFrontReady ? "rotate-y-180" : ""}`}>
       {/* カード裏面 */}
       <div
         className="
@@ -49,7 +55,8 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
         >
           {/* スプライト レアリティサークル */}
           <div className="relative">
-            {data.image !== null && <img src={data.image} alt={jaName} className="relative z-10 size-30 md:size-35" />}
+            {/* 画像が読み込まれてからカードを回転させることで、キャッシュ時の即時表示を防ぐ */}
+            {data.image !== null && <img src={data.image} alt={jaName} onLoad={() => setIsImgSettled(true)} onError={() => setIsImgSettled(true)} className="relative z-10 size-30 md:size-35" />}
             <span
               className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-12 rounded-full bg-linear-to-tr ${circleClassName}
         `}
