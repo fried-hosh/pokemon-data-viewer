@@ -39,7 +39,7 @@ const PokemonTopPage = () => {
       <div className="flex flex-col gap-2">
         <ul className="flex flex-col md:flex-row justify-center gap-2">
           {picks.map(([jaName, apiName]) => (
-            <li key={apiName} className="flex-1 ">
+            <li key={apiName} className="md:flex-1 h-32 md:h-70 perspective-distant">
               <PokemonPickCard jaName={jaName} apiName={apiName} />
             </li>
           ))}
