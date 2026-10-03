@@ -18,6 +18,8 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
   const [isImgSettled, setIsImgSettled] = useState(false);
   // カードが配られ終えたかどうか
   const [isDealt, setIsDealt] = useState(false);
+  // カードが光り終えたかどうか
+  const [isGlowEnd, setIsGlowEnd] = useState(false);
 
   // 画像を読み込み終えたか、画像がないときに表面を見せる
   const isFrontReady = isImgSettled || data?.image === null;
@@ -25,6 +27,8 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
   if (isError) {
     return <p className="text-red-200">取得失敗</p>;
   }
+
+  const isRare = data?.isLegendary || data?.isMythical;
 
   let circleClassName = normalCircleClassName;
   if (data?.isLegendary) {
@@ -38,13 +42,14 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
     // フェードイン
     <div className="absolute inset-0 z-10 animate-card-fade-in perspective-distant" onAnimationEnd={() => setIsDealt(true)}>
       {/* 回転 */}
-      <div className={`relative h-full transform-3d transition-transform duration-1000 ${isFrontReady && isDealt ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""}`}>
+      <div className={`relative h-full transform-3d transition-transform duration-1000 ${isFrontReady && isDealt && (isGlowEnd || !isRare) ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""}`}>
         {/* カード裏面 */}
         <div
-          className="
+          className={`
       absolute z-30 inset-0 h-full rounded-2xl border shadow-lg border-(--border) dark:border-0 bg-linear-to-br from-amber-400 to-slate-400
-      backface-hidden
-      "
+      backface-hidden ${isDealt && isRare ? "animate-rare-glow" : ""}
+      `}
+          onAnimationEnd={() => setIsGlowEnd(true)}
         />
         {/* 表面 */}
         {data !== undefined && (
