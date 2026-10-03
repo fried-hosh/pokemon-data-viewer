@@ -3,14 +3,17 @@ import { pokemonSearchMap } from "../lib/pokemonSearchMap";
 import PokemonPickCard from "../components/PokemonPickCard";
 import { useIsFetching } from "@tanstack/react-query";
 
-// 3匹ランダムで引く
-const randomPick = () => {
+// 3匹ランダムで引く / 前回引いたポケモンは除外
+const randomPick = (excludes: [string, string][] = []) => {
   const entries = Object.entries(pokemonSearchMap);
+
+  const excludesNames = excludes.map(([, apiName]) => apiName);
   const uniqueThreePicks = new Set<[string, string]>();
+
   while (uniqueThreePicks.size < 3) {
     const randomLocation = Math.floor(Math.random() * entries.length);
     const picked = entries[randomLocation];
-    if (picked !== undefined) {
+    if (picked !== undefined && !excludesNames.includes(picked[1])) {
       uniqueThreePicks.add(picked);
     }
   }
@@ -28,7 +31,7 @@ const PokemonTopPage = () => {
 
   const handleReroll = () => {
     setPrevPicks(picks);
-    setPicks(randomPick());
+    setPicks(randomPick(picks));
   };
 
   return (
