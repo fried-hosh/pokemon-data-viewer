@@ -17,14 +17,14 @@
   }
 }
 @theme {
-  --animate-card-fade-in: card-fade-in 600ms ease-out both;
+  --animate-card-fade-in: card-fade-in 500ms ease-out both;
 
   @keyframes card-fade-in {
     0% {
       opacity: 0.5;
       transform: translateY(-50px);
     }
-    60%,
+
     100% {
       opacity: 1;
       transform: translateY(0);
@@ -32,15 +32,25 @@
   }
 }
 @theme {
-  --animate-rare-glow: rare-glow 300ms ease-in-out 2;
+  --animate-legendary-glow: legendary-glow 300ms ease-in-out 2;
+  --animate-mythical-glow: mythical-glow 300ms ease-in-out 2;
 
-  @keyframes rare-glow {
+  @keyframes legendary-glow {
     0%,
     100% {
       box-shadow: 0 0 0 0 var(--color-amber-300);
     }
     50% {
       box-shadow: 0 0 24px 8px var(--color-amber-300);
+    }
+  }
+  @keyframes mythical-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 var(--color-pink-300);
+    }
+    50% {
+      box-shadow: 0 0 24px 8px var(--color-cyan-200);
     }
   }
 }

@@ -38,6 +38,14 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
     circleClassName = mythicalCircleClassName;
   }
 
+  let glowClassName = "";
+  if (data?.isLegendary) {
+    glowClassName = "animate-legendary-glow";
+  }
+  if (data?.isMythical) {
+    glowClassName = "animate-mythical-glow";
+  }
+
   return (
     // フェードイン
     <div className="absolute inset-0 z-10 animate-card-fade-in perspective-distant" onAnimationEnd={() => setIsDealt(true)}>
@@ -46,11 +54,25 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
         {/* カード裏面 */}
         <div
           className={`
-      absolute z-30 inset-0 h-full rounded-2xl border shadow-lg border-(--border) dark:border-0 bg-linear-to-br from-amber-400 to-slate-400
-      backface-hidden ${isDealt && isRare ? "animate-rare-glow" : ""}
+      absolute inset-0 rounded-2xl border shadow-lg border-(--border) dark:border-0 bg-linear-to-br from-slate-700 to-slate-900
+      backface-hidden ${isDealt && isRare ? glowClassName : ""}
       `}
           onAnimationEnd={() => setIsGlowEnd(true)}
-        />
+        >
+          {/* ボールマーク */}
+          <div
+            className="
+        absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 size-16 rounded-full border-4 border-white/80 bg-origin-border
+        bg-linear-to-b from-pink-400 from-50% to-slate-50 to-50%
+        "
+          >
+            {/* ボール真ん中の区切り線 */}
+            <div className="absolute top-1/2 inset-x-0 h-1 -translate-y-1/2 bg-slate-900" />
+            {/* ボール真ん中の丸ボタン */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-5 rounded-full border-4 border-slate-900 bg-slate-50" />
+          </div>
+        </div>
+
         {/* 表面 */}
         {data !== undefined && (
           <Link
