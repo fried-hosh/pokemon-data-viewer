@@ -25,7 +25,7 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
   const isFrontReady = isImgSettled || data?.image === null;
 
   if (isError) {
-    return <p className="text-red-200">取得失敗</p>;
+    return <p className="absolute inset-0 z-10 flex justify-center items-center rounded-2xl bg-slate-800/90 text-red-200">取得失敗</p>;
   }
 
   const isRare = data?.isLegendary || data?.isMythical;
