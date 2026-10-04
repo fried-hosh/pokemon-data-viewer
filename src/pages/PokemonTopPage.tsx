@@ -55,9 +55,9 @@ const PokemonTopPage = () => {
               // 親であるliのkeyがポケモンの名前だとほぼ毎回子ごと再描画されるため、引き直し前後で変わらないindexをkeyにする
               <li key={index} className="relative md:flex-1 h-32 md:h-70">
                 {/* 引き直し押下後に作られる引き直し前のカード。 keyを apiName にすることで、元々あったカードと同じ要素として表示位置と状態を引き継ぐ */}
-                {prevPick !== undefined && <PokemonPickCard key={prevPick[1]} jaName={prevPick[0]} apiName={prevPick[1]} />}
+                {prevPick !== undefined && <PokemonPickCard key={prevPick[1]} jaName={prevPick[0]} apiName={prevPick[1]} index={index} />}
                 {/* 初期表示 もしくは 新しく引いたカード。 初めて出るkeyのため新しく作られる  */}
-                <PokemonPickCard key={apiName} jaName={jaName} apiName={apiName} />
+                <PokemonPickCard key={apiName} jaName={jaName} apiName={apiName} index={index} />
               </li>
             );
           })}

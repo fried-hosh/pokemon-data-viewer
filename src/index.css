@@ -18,16 +18,27 @@
 }
 @theme {
   --animate-card-fade-in: card-fade-in 500ms ease-out both;
+  --animate-card-fade-in-mobile: card-fade-in-mobile 500ms ease-out both;
 
   @keyframes card-fade-in {
     0% {
       opacity: 0.5;
       transform: translateY(-50px);
     }
-
     100% {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  @keyframes card-fade-in-mobile {
+    0% {
+      opacity: 0.5;
+      transform: translateX(-40px);
+    }
+    70%,
+    100% {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 }

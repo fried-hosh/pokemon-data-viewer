@@ -6,13 +6,14 @@ import { useState } from "react";
 type Props = {
   jaName: string;
   apiName: string;
+  index: number;
 };
 
 const normalCircleClassName = "from-slate-400 to-slate-100";
 const legendaryCircleClassName = "from-orange-500 via-amber-300 to-yellow-100 shadow-lg shadow-orange-500/30";
 const mythicalCircleClassName = "from-pink-300 via-violet-300 to-cyan-200 shadow-lg shadow-pink-300/60";
 
-const PokemonPickCard = ({ jaName, apiName }: Props) => {
+const PokemonPickCard = ({ jaName, apiName, index }: Props) => {
   const { data, isError } = usePokemonCard(apiName);
   // 画像の取得が成功・失敗に関わらず完了したかどうか
   const [isImgSettled, setIsImgSettled] = useState(false);
@@ -48,7 +49,7 @@ const PokemonPickCard = ({ jaName, apiName }: Props) => {
 
   return (
     // フェードイン
-    <div className="absolute inset-0 z-10 animate-card-fade-in perspective-distant" onAnimationEnd={() => setIsDealt(true)}>
+    <div className="absolute inset-0 z-10 animate-card-fade-in-mobile md:animate-card-fade-in perspective-distant" style={{ animationDelay: `${index * 80}ms` }} onAnimationEnd={() => setIsDealt(true)}>
       {/* 回転 */}
       <div className={`relative h-full transform-3d transition-transform duration-1000 ${isFrontReady && isDealt && (isGlowEnd || !isRare) ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""}`}>
         {/* カード裏面 */}
