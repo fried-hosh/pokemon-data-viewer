@@ -22,7 +22,7 @@
 
   @keyframes card-fade-in {
     0% {
-      opacity: 0.5;
+      opacity: 0;
       transform: translateY(-50px);
     }
     100% {
@@ -32,8 +32,8 @@
   }
   @keyframes card-fade-in-mobile {
     0% {
-      opacity: 0.5;
-      transform: translateX(-40px);
+      opacity: 0;
+      transform: translateX(-50px);
     }
     70%,
     100% {

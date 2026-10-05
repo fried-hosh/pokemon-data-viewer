@@ -8,13 +8,14 @@ type Props = {
   apiName: string;
   index: number;
   onFinished: (apiName: string) => void;
+  hasShadow: boolean;
 };
 
 const normalCircleClassName = "from-slate-400 to-slate-100";
 const legendaryCircleClassName = "from-orange-500 via-amber-300 to-yellow-100 shadow-lg shadow-orange-500/30";
 const mythicalCircleClassName = "from-pink-300 via-violet-300 to-cyan-200 shadow-lg shadow-pink-300/60";
 
-const PokemonPickCard = ({ jaName, apiName, index, onFinished }: Props) => {
+const PokemonPickCard = ({ jaName, apiName, index, onFinished, hasShadow }: Props) => {
   const { data, isError } = usePokemonCard(apiName);
   // 画像の取得が成功・失敗に関わらず完了したかどうか
   const [isImgSettled, setIsImgSettled] = useState(false);
@@ -63,7 +64,7 @@ const PokemonPickCard = ({ jaName, apiName, index, onFinished }: Props) => {
         {/* カード裏面 */}
         <div
           className={`
-      absolute inset-0 rounded-2xl border shadow-lg border-(--border) dark:border-0 bg-linear-to-br from-slate-700 to-slate-900
+      absolute inset-0 rounded-2xl border ${hasShadow ? "shadow-lg" : ""} border-(--border) dark:border-0 bg-linear-to-br from-slate-700 to-slate-900
       backface-hidden ${isDealt && isRare ? glowClassName : ""}
       `}
           onAnimationEnd={() => setIsGlowEnd(true)}
@@ -88,7 +89,9 @@ const PokemonPickCard = ({ jaName, apiName, index, onFinished }: Props) => {
             to={`/pokemon/${apiName}`}
             className={`
     flex md:flex-col gap-0.5 p-1 items-center h-full
-    rounded-2xl border shadow-lg border-(--border) dark:border-0
+    rounded-2xl border
+    ${hasShadow ? "shadow-lg" : ""}
+    border-(--border) dark:border-0
     bg-linear-to-br from-sky-200 to-amber-50
     dark:from-slate-800 dark:to-amber-50
     backface-hidden rotate-x-180 md:rotate-x-0 md:rotate-y-180

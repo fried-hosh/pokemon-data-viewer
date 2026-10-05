@@ -56,15 +56,20 @@ const PokemonTopPage = () => {
         <ul className="flex flex-col md:flex-row justify-center gap-2">
           {picks.map(([jaName, apiName], index) => {
             const prevPick = prevPicks[index];
+            // カードの影を1枠に1つだけつける
+            // 前のカードがあるとき -> 前のカードにつける
+            // 前のカードがアンマウントされたとき or 初期表示時 -> 新しいカードにつける
+            const isPrevCardShown = prevPick !== undefined && !isAllCardOpened;
+
             return (
               // 親であるliのkeyがポケモンの名前だとほぼ毎回子ごと再描画されるため、引き直し前後で変わらないindexをkeyにする
               <li key={index} className="relative md:flex-1 h-32 md:h-70">
                 {/* 引き直し押下後に作られる引き直し前のカード。 keyを apiName にすることで、元々あったカードと同じ要素として表示位置と状態を引き継ぐ */}
                 {/* 最新のカードが全てめくれ次第アンマウント */}
-                {prevPick !== undefined && !isAllCardOpened && <PokemonPickCard key={prevPick[1]} jaName={prevPick[0]} apiName={prevPick[1]} index={index} onFinished={handleCardOpened} />}
+                {isPrevCardShown && <PokemonPickCard key={prevPick[1]} jaName={prevPick[0]} apiName={prevPick[1]} index={index} onFinished={handleCardOpened} hasShadow={true} />}
 
                 {/* 初期表示 もしくは 新しく引いたカード。 初めて出るkeyのため新しく作られる  */}
-                <PokemonPickCard key={apiName} jaName={jaName} apiName={apiName} index={index} onFinished={handleCardOpened} />
+                <PokemonPickCard key={apiName} jaName={jaName} apiName={apiName} index={index} onFinished={handleCardOpened} hasShadow={!isPrevCardShown} />
               </li>
             );
           })}
