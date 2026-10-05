@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { pokemonSearchMap } from "../lib/pokemonSearchMap";
 import PokemonPickCard from "../components/PokemonPickCard";
-import { useIsFetching } from "@tanstack/react-query";
 
 // 3匹ランダムで引く / 前回引いたポケモンは除外
 const randomPick = (excludes: [string, string][] = []) => {
@@ -25,14 +24,20 @@ const PokemonTopPage = () => {
   const [picks, setPicks] = useState(() => randomPick());
   // 引き直し前の3匹を記憶
   const [prevPicks, setPrevPicks] = useState<[string, string][]>([]);
+  // 演出を終えたカードの apiName を記憶 / 引き直しで空に戻す
+  const [openedCards, setOpenedCards] = useState<string[]>([]);
 
-  const fetchingCount = useIsFetching({ queryKey: ["pokemonCard"] });
-  const isFetching = fetchingCount > 0;
+  const handleCardOpened = useCallback((apiName: string) => {
+    setOpenedCards((prev) => [...prev, apiName]);
+  }, []);
 
   const handleReroll = () => {
+    setOpenedCards([]);
     setPrevPicks(picks);
     setPicks(randomPick(picks));
   };
+  // 3匹のカードが全て演出を終えたかどうか。 件数ではなく名前で判断し、画面幅切り替え時のrotateによる重複した発火の影響を受けないようにする
+  const isAllCardOpened = picks.every(([, apiName]) => openedCards.includes(apiName));
 
   return (
     <section className={`relative w-full max-w-3xl mx-auto mt-4 pt-8 pb-6 px-8 border rounded-2xl shadow-lg border-(--border) bg-(--code-bg)`}>
@@ -55,16 +60,18 @@ const PokemonTopPage = () => {
               // 親であるliのkeyがポケモンの名前だとほぼ毎回子ごと再描画されるため、引き直し前後で変わらないindexをkeyにする
               <li key={index} className="relative md:flex-1 h-32 md:h-70">
                 {/* 引き直し押下後に作られる引き直し前のカード。 keyを apiName にすることで、元々あったカードと同じ要素として表示位置と状態を引き継ぐ */}
-                {prevPick !== undefined && <PokemonPickCard key={prevPick[1]} jaName={prevPick[0]} apiName={prevPick[1]} index={index} />}
+                {/* 最新のカードが全てめくれ次第アンマウント */}
+                {prevPick !== undefined && !isAllCardOpened && <PokemonPickCard key={prevPick[1]} jaName={prevPick[0]} apiName={prevPick[1]} index={index} onFinished={handleCardOpened} />}
+
                 {/* 初期表示 もしくは 新しく引いたカード。 初めて出るkeyのため新しく作られる  */}
-                <PokemonPickCard key={apiName} jaName={jaName} apiName={apiName} index={index} />
+                <PokemonPickCard key={apiName} jaName={jaName} apiName={apiName} index={index} onFinished={handleCardOpened} />
               </li>
             );
           })}
         </ul>
         {/* 引き直しボタン */}
         <button
-          disabled={isFetching}
+          disabled={!isAllCardOpened}
           type="button"
           onClick={() => handleReroll()}
           className="group
@@ -77,7 +84,7 @@ const PokemonTopPage = () => {
           <span
             className={`
         text-pink-400 dark:text-amber-200 font-bold mr-1
-        inline-block group-hover:rotate-360 transition-transform duration-300 ${isFetching ? "animate-spin" : ""}
+        inline-block group-hover:rotate-360 transition-transform duration-300 ${!isAllCardOpened ? "animate-spin" : ""}
         `}
           >
             ↻

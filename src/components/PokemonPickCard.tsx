@@ -1,19 +1,20 @@
 import { Link } from "react-router-dom";
 import { usePokemonCard } from "../hooks/usePokemonCard";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   jaName: string;
   apiName: string;
   index: number;
+  onFinished: (apiName: string) => void;
 };
 
 const normalCircleClassName = "from-slate-400 to-slate-100";
 const legendaryCircleClassName = "from-orange-500 via-amber-300 to-yellow-100 shadow-lg shadow-orange-500/30";
 const mythicalCircleClassName = "from-pink-300 via-violet-300 to-cyan-200 shadow-lg shadow-pink-300/60";
 
-const PokemonPickCard = ({ jaName, apiName, index }: Props) => {
+const PokemonPickCard = ({ jaName, apiName, index, onFinished }: Props) => {
   const { data, isError } = usePokemonCard(apiName);
   // 画像の取得が成功・失敗に関わらず完了したかどうか
   const [isImgSettled, setIsImgSettled] = useState(false);
@@ -24,6 +25,13 @@ const PokemonPickCard = ({ jaName, apiName, index }: Props) => {
 
   // 画像を読み込み終えたか、画像がないときに表面を見せる
   const isFrontReady = isImgSettled || data?.image === null;
+
+  // 取得失敗時にも通知
+  useEffect(() => {
+    if (isError) {
+      onFinished(apiName);
+    }
+  }, [isError, apiName, onFinished]);
 
   if (isError) {
     return <p className="absolute inset-0 z-10 flex justify-center items-center rounded-2xl bg-slate-800/90 text-red-200">取得失敗</p>;
@@ -50,8 +58,8 @@ const PokemonPickCard = ({ jaName, apiName, index }: Props) => {
   return (
     // フェードイン
     <div className="absolute inset-0 z-10 animate-card-fade-in-mobile md:animate-card-fade-in perspective-distant" style={{ animationDelay: `${index * 80}ms` }} onAnimationEnd={() => setIsDealt(true)}>
-      {/* 回転 */}
-      <div className={`relative h-full transform-3d transition-transform duration-1000 ${isFrontReady && isDealt && (isGlowEnd || !isRare) ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""}`}>
+      {/* 回転 / めくり終えたら演出の終了を親に通知する */}
+      <div className={`relative h-full transform-3d transition-transform duration-800 ${isFrontReady && isDealt && (isGlowEnd || !isRare) ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""}`} onTransitionEnd={() => onFinished(apiName)}>
         {/* カード裏面 */}
         <div
           className={`
