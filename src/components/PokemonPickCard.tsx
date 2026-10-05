@@ -65,7 +65,8 @@ const PokemonPickCard = ({ jaName, apiName, index, onFinished, hasShadow }: Prop
         <div
           className={`
       absolute inset-0 rounded-2xl border ${hasShadow ? "shadow-lg" : ""} border-(--border) dark:border-0 bg-linear-to-br from-slate-700 to-slate-900
-      backface-hidden ${isDealt && isRare ? glowClassName : ""}
+      backface-hidden translate-z-px
+       ${isDealt && isRare ? glowClassName : ""}
       `}
           onAnimationEnd={() => setIsGlowEnd(true)}
         >
@@ -94,7 +95,7 @@ const PokemonPickCard = ({ jaName, apiName, index, onFinished, hasShadow }: Prop
     border-(--border) dark:border-0
     bg-linear-to-br from-sky-200 to-amber-50
     dark:from-slate-800 dark:to-amber-50
-    backface-hidden rotate-x-180 md:rotate-x-0 md:rotate-y-180
+    backface-hidden rotate-x-180 md:rotate-x-0 md:rotate-y-180 -translate-z-px
     `}
           >
             {/* スプライト レアリティサークル */}
