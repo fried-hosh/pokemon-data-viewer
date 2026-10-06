@@ -60,11 +60,13 @@ const PokemonPickCard = ({ jaName, apiName, index, onFinished, hasShadow }: Prop
     // フェードイン
     <div className="absolute inset-0 z-10 animate-card-fade-in-mobile md:animate-card-fade-in perspective-distant" style={{ animationDelay: `${index * 80}ms` }} onAnimationEnd={() => setIsDealt(true)}>
       {/* 回転 / めくり終えたら演出の終了を親に通知する */}
-      <div className={`relative h-full transform-3d transition-transform duration-800 ${isFrontReady && isDealt && (isGlowEnd || !isRare) ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""}`} onTransitionEnd={() => onFinished(apiName)}>
+      <div className={`relative h-full transform-3d transition-transform duration-800 ${isFrontReady && isDealt && (isGlowEnd || !isRare) ? "rotate-x-180 md:rotate-x-0 md:rotate-y-180" : ""} will-change-transform`} onTransitionEnd={() => onFinished(apiName)}>
         {/* カード裏面 */}
         <div
           className={`
-      absolute inset-0 rounded-2xl border ${hasShadow ? "shadow-lg" : ""} border-(--border) dark:border-0 bg-linear-to-br from-slate-700 to-slate-900
+      absolute inset-0 rounded-2xl border ${hasShadow ? "shadow-lg" : ""} border-(--border) dark:border-0
+      bg-linear-to-b from-olive-200 to-olive-400
+      dark:from-slate-700 dark:to-slate-900
       backface-hidden translate-z-px
        ${isDealt && isRare ? glowClassName : ""}
       `}
@@ -93,9 +95,10 @@ const PokemonPickCard = ({ jaName, apiName, index, onFinished, hasShadow }: Prop
     rounded-2xl border
     ${hasShadow ? "shadow-lg" : ""}
     border-(--border) dark:border-0
-    bg-linear-to-br from-sky-200 to-amber-50
-    dark:from-slate-800 dark:to-amber-50
-    backface-hidden rotate-x-180 md:rotate-x-0 md:rotate-y-180 -translate-z-px
+    bg-linear-to-br md:bg-linear-to-b from-sky-200 to-amber-50 to-70%
+    dark:bg-linear-to-br dark:from-blue-800 dark:from-5% dark:to-amber-100 dark:to-90%
+    md:dark:bg-linear-to-b
+    backface-hidden rotate-x-180 md:rotate-x-0 md:rotate-y-180
     `}
           >
             {/* スプライト レアリティサークル */}
