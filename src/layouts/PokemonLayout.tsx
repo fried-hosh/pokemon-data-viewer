@@ -21,7 +21,7 @@ const PokemonLayout = () => {
         <PokemonSearchForm onSearch={handleSearch} />
       </header>
 
-      <Outlet context={{ pokemonName: null }} />
+      <Outlet />
     </div>
   );
 };
