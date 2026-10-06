@@ -16,6 +16,55 @@
     }
   }
 }
+@theme {
+  --animate-card-fade-in: card-fade-in 500ms ease-out both;
+  --animate-card-fade-in-mobile: card-fade-in-mobile 500ms ease-out both;
+
+  @keyframes card-fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes card-fade-in-mobile {
+    0% {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+    70%,
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+@theme {
+  --animate-legendary-glow: legendary-glow 300ms ease-in-out 2;
+  --animate-mythical-glow: mythical-glow 300ms ease-in-out 2;
+
+  @keyframes legendary-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 var(--color-amber-300);
+    }
+    50% {
+      box-shadow: 0 0 24px 8px var(--color-amber-300);
+    }
+  }
+  @keyframes mythical-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 var(--color-pink-300);
+    }
+    50% {
+      box-shadow: 0 0 24px 8px var(--color-cyan-200);
+    }
+  }
+}
 
 @layer base {
   html:has(dialog:modal) {
