@@ -40,7 +40,7 @@ const PokemonTopPage = () => {
   const isAllCardOpened = picks.every(([, apiName]) => openedCards.includes(apiName));
 
   return (
-    <section className={`relative w-full max-w-3xl mx-auto mt-4 pt-8 pb-6 px-8 border rounded-2xl shadow-lg border-(--border) bg-(--code-bg)`}>
+    <section className={`relative w-full max-w-3xl mx-auto mt-8 pt-8 pb-6 px-8 border rounded-2xl shadow-lg border-(--border) bg-(--code-bg)`}>
       {/* タイトル*/}
       <h3
         className={`

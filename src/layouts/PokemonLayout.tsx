@@ -14,9 +14,10 @@ const PokemonLayout = () => {
 
   return (
     <div>
-      <header className="flex items-center justify-center">
-        <button type="button" onClick={() => navigate(`/`)} className="ml-6">
-          TOP
+      <header className="flex items-center justify-between border-b-2 border-(--border) px-2">
+        <button type="button" onClick={() => navigate(`/`)} className="ml-6 font-bold  md:text-xl cursor-pointer">
+          <span className="text-slate-600 dark:text-amber-50">Peek</span>
+          <span className="text-pink-400 dark:text-amber-500">Dex</span>
         </button>
         <PokemonSearchForm onSearch={handleSearch} />
       </header>

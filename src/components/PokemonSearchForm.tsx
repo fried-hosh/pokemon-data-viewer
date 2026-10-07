@@ -65,7 +65,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
 
   return (
     <div>
-      <form className="flex gap-2 p-6 mx-auto max-w-xl" onSubmit={handleSubmit}>
+      <form className="flex gap-2 p-4 mx-auto max-w-xl" onSubmit={handleSubmit}>
         <div
           className="relative flex-1"
           onBlur={(event) => {
@@ -75,9 +75,16 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
             setIsSuggestOpen(false);
           }}
         >
+          {/* 入力欄 */}
           <input
             ref={inputRef}
-            className=" w-full rounded-xl border border-amber-300 bg-white px-4 py-3 text-black shadow-sm focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition"
+            className=" w-full rounded-xl bg-white dark:bg-slate-800 px-4 py-3 text-olive-700 dark:text-white font-semibold shadow-sm
+            border border-olive-300 dark:border-amber-300
+            focus:outline-none focus:ring-2
+            focus:border-olive-400 focus:ring-olive-400
+            dark:focus:border-amber-400 dark:focus:ring-amber-200
+            transition
+            "
             type="text"
             value={inputName}
             onChange={(event) => {
@@ -91,8 +98,8 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
             <ul
               className="
             absolute z-50 top-full left-0 min-w-auto flex flex-col gap-0.5 mt-1 p-1.5 shadow-md
-            border rounded-xl border-amber-300 dark:border-slate-400
-            bg-amber-100/80 dark:bg-slate-900/80
+            border rounded-xl border-olive-300 dark:border-slate-400
+            bg-taupe-100/80 dark:bg-slate-900/80
             "
               onMouseDown={(event) => event.preventDefault()}
             >
@@ -104,8 +111,8 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
                       className="
                     w-full p-0.5 px-2 font-bold text-lg border rounded border-slate-700/15 dark:border-slate-200/20
                     hover:ring hover:ring-amber-50
-                    bg-yellow-50 dark:bg-slate-900
-                    hover:bg-amber-400 hover:text-black dark:hover:bg-amber-500 dark:hover:text-white
+                    bg-olive-50 dark:bg-slate-900
+                    hover:bg-taupe-300 hover:text-black dark:hover:bg-amber-500 dark:hover:text-white
                     transition-colors
                     "
                       type="button"
@@ -141,9 +148,14 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
 
         {/* 検索ボタン */}
         <button
-          className="font-bold text-white px-5 py-3 rounded-xl border border-amber-500 bg-amber-500
-          text-lg leading-none
-         hover:bg-amber-600 hover:shadow-md shadow-sm active:translate-y-0.5 transition focus-visible:outline-*"
+          className="font-bold px-5 py-3 rounded-xl border
+         text-lg leading-none
+         text-white dark:text-white
+         border-olive-400 bg-stone-400
+         dark:border-amber-500 dark:bg-amber-500 hover:bg-stone-600
+         dark:hover:bg-amber-600 hover:shadow-md shadow-sm active:translate-y-0.5 transition
+         cursor-pointer
+         "
           type="submit"
         >
           検索
