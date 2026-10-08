@@ -30,7 +30,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
   const evolutionDialogRef = useRef<HTMLDialogElement>(null);
 
   return (
-    <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2 ">
+    <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[1fr_1fr_1fr] ">
       {/* 基本情報 - 名前、画像、タイプ、特性、進化表モーダル */}
       <section className={panelClassName}>
         <div className="grid grid-cols-2 gap-4">
@@ -41,7 +41,12 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
               {details.types.map((type) => {
                 const typeInfo = pokemonTypeMap[type];
                 return (
-                  <li key={type} className={`${typeInfo.bgColorClass} rounded px-2 py-1 text-white`}>
+                  <li
+                    key={type}
+                    className={`${typeInfo.bgColorClass} rounded px-2 py-1 text-white
+
+                    `}
+                  >
                     {typeInfo.ja}
                   </li>
                 );
@@ -118,13 +123,15 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         <PokemonTypeEffectivenessPanel typeEffectiveness={details.typeEffectiveness} panelClassName={panelClassName} />
       </div>
 
+      {/* 覚える技 */}
+      <div className="lg:row-span-2 lg:relative">
+        {isMovesLoading && <p>技データを読み込み中...</p>}
+        {isMovesError && <p className="text-red-200">技の取得に失敗しました</p>}
+        {moves && <PokemonMovesPanel pokemonMoves={moves} panelClassName={`${panelClassName} lg:absolute lg:inset-0 lg:flex lg:flex-col`} />}
+      </div>
+
       {/* 進化チェーン */}
       <PokemonEvolutionPanel details={details} panelClassName={`${panelClassName} lg:col-span-2`} mobileDialogRef={evolutionDialogRef} />
-
-      {/* 覚える技 */}
-      {isMovesLoading && <p>技データを読み込み中...</p>}
-      {isMovesError && <p className="text-red-200">技の取得に失敗しました</p>}
-      {moves && <PokemonMovesPanel pokemonMoves={moves} panelClassName={panelClassName} />}
     </div>
   );
 };

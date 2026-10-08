@@ -117,7 +117,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
       {/* スクロール領域 */}
       <div
         className="
-      max-h-[60vh] overflow-y-auto p-2 shadow-inner
+      max-h-[60vh] lg:max-h-none lg:flex-1 overflow-y-auto p-2 shadow-inner
       rounded-lg border border-slate-300
       dark:border-slate-600 dark:bg-slate-900/20
       "
