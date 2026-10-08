@@ -14,7 +14,11 @@ const PokemonLayout = () => {
 
   return (
     <div>
-      <header className="grid grid-cols-[1fr_4fr] border-b-2 border-(--border) px-2">
+      <header
+        className="grid grid-cols-[1fr_4fr] px-2
+        bg-olive-350 dark:bg-(--code-bg)
+      "
+      >
         <button type="button" onClick={() => navigate(`/`)} className="justify-self-start ml-2 font-bold  md:text-xl cursor-pointer">
           <span className="text-slate-600 dark:text-amber-50">Peek</span>
           <span className="text-pink-400 dark:text-amber-500">Dex</span>
