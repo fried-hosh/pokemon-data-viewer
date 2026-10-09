@@ -22,7 +22,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
     }, 0);
 
   // パネルの共通レイアウト
-  const panelClassName = "p-5 rounded-2xl border text-left shadow-lg border-(--border) bg-(--code-bg)";
+  const panelClassName = "p-3 md:p-5 rounded-2xl border text-left shadow-lg border-(--border) bg-(--code-bg)";
   // 種族値ゲージの上限値
   const MAX_BASE_STAT = 255;
 
@@ -37,7 +37,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       {/* 基本情報 - 名前、画像、タイプ、特性、進化表モーダル */}
       <section className={panelClassName}>
         <div className="grid grid-cols-2 gap-4">
-          {details.imageUrl !== null && <img className="mx-auto h-48 w-48 object-contain" src={details.imageUrl} alt={details.name} />}
+          {details.imageUrl !== null && <img className="mx-auto size-30 md:size-48 object-contain" src={details.imageUrl} alt={details.name} />}
           <div className="flex flex-col gap-2">
             <h2>{details.name}</h2>
             <ul className="flex gap-1 font-bold">
@@ -46,8 +46,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                 return (
                   <li
                     key={type}
-                    className={`${typeInfo.bgColorClass} rounded px-2 py-1 text-white
-
+                    className={`${typeInfo.bgColorClass} rounded px-2 py-1 text-white text-sm md:text-base
                     `}
                   >
                     {typeInfo.ja}
@@ -80,14 +79,14 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
           <ul className="divide-y divide-slate-200 dark:divide-slate-700">
             {details.abilities.map((ability) => (
               <li key={ability.name} className="flex flex-col gap-1">
-                <div className="flex flex-col gap-1 py-3">
+                <div className="flex flex-col gap-1 py-2 md:py-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg text-slate-700 dark:text-slate-200">{ability.name}</span>
+                    <span className="font-bold text-base md:text-lg text-slate-700 dark:text-slate-200">{ability.name}</span>
 
                     {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
                   </div>
 
-                  <span className="text-sm text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "日本語の説明文がありません"}</span>
+                  <span className="text-sm md:text-base text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "日本語の説明文がありません"}</span>
                 </div>
               </li>
             ))}
