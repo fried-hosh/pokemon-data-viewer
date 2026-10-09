@@ -108,7 +108,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
   return (
     <section className={`${panelClassName}`}>
       {/* タイトル 対象作品名 */}
-      <div className="mb-3 flex justify-between items-center  border-slate-400">
+      <div className="mb-3 flex justify-between items-center border-slate-400">
         <h2>覚える技</h2>
         {displayVersionName !== undefined && <span className="font-bold">{`${versionGroupMap[displayVersionName] ?? displayVersionName}`}</span>}
       </div>
@@ -144,21 +144,33 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
                 dark:border-amber-50/80 dark:bg-amber-100/4 rounded
                 "
               >
-                {/* 1段目 - レベル 技名 タイプ名 */}
-                <div className="flex gap-3 items-center">
-                  {learnMethod === "level-up" && <span className="w-12">Lv. {move.level} </span>}
-                  <div className="flex flex-1 items-center justify-between ">
-                    <span className="text-slate-700 dark:text-white">{move.jaName}</span>
-                    <span className={`rounded-xl px-2 py-1 text-white text-sm ${pokemonTypeMap[move.type].bgColorClass}`}>{pokemonTypeMap[move.type].ja}</span>
+                {/* mdのみ配置変更 */}
+                <div className="md:grid md:grid-cols-2 md:items-center md:gap-6 lg:block">
+                  {/* 1段目 - レベル 技名 タイプ名 */}
+                  <div className="flex gap-3 items-center">
+                    {learnMethod === "level-up" && <span className="w-12">Lv. {move.level} </span>}
+                    <div className="flex flex-1 items-center justify-between ">
+                      <span className="text-slate-700 dark:text-white">{move.jaName}</span>
+                      <span className={`rounded-xl px-2 py-1 text-white text-sm ${pokemonTypeMap[move.type].bgColorClass}`}>{pokemonTypeMap[move.type].ja}</span>
+                    </div>
                   </div>
-                </div>
-                {/* 2段目 - 技区分 威力 命中 PP*/}
-                <div className="flex justify-between">
-                  <span>{damageClassMap[move.damageClass]}</span>
-                  <div className="flex gap-3">
-                    <span>威力 {move.power || "-"}</span>
-                    <span>命中 {move.accuracy || "-"}</span>
-                    <span>PP {move.pp || "-"}</span>
+                  {/* 2段目 - 技区分 威力 命中 PP*/}
+                  <div className="flex justify-between">
+                    <span>{damageClassMap[move.damageClass]}</span>
+                    <div className="flex gap-4">
+                      <span className="flex justify-between w-16">
+                        <span>威力</span>
+                        <span>{move.power || "―"}</span>
+                      </span>
+                      <span className="flex justify-between w-16">
+                        <span>命中</span>
+                        <span>{move.accuracy || "―"}</span>
+                      </span>
+                      <span className="flex justify-between w-10">
+                        <span>PP</span>
+                        <span>{move.pp || "―"}</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
