@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { type PokemonDetails } from "../api/getPokemonDetails";
 import { pokemonTypeMap } from "../lib/pokemonTypeMap";
 import PokemonEvolutionPanel from "./PokemonEvolutionPanel";
@@ -13,7 +13,12 @@ type Props = {
   isMovesError: boolean;
 };
 
+type DetailTab = "stats" | "typeEffectiveness" | "moves";
+
 const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Props) => {
+  // モバイルでのタブ切り替え
+  const [activeTab, setActiveTab] = useState<DetailTab>("stats");
+
   // 合計種族値
   const totalStats = details.stats
     .map((stat) => stat.baseStat)
@@ -94,9 +99,23 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         </section>
       </section>
 
+      {/* タブ切り替えボタン */}
+      <div className="md:hidden flex justify-start gap-7 ml-3">
+        <button type="button" onClick={() => setActiveTab("stats")}>
+          種族値
+        </button>
+        <button type="button" onClick={() => setActiveTab("typeEffectiveness")}>
+          タイプ相性
+        </button>
+        <button type="button" onClick={() => setActiveTab("moves")}>
+          覚える技
+        </button>
+      </div>
+
       {/* 種族値 */}
-      <div className="flex flex-col gap-4">
-        <section className={panelClassName}>
+      {/* 技タブが選択された時は hidden にする (空文字だとgap-4が残って技タブ選択時のみ不自然な間が空くため) */}
+      <div className={`flex flex-col gap-4 ${activeTab === "moves" ? "hidden md:flex" : ""}`}>
+        <section className={`${activeTab === "stats" ? "" : "hidden md:block"} ${panelClassName}`}>
           <div className="flex justify-between items-center">
             <h2>種族値</h2>
             <span>
@@ -122,11 +141,11 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         </section>
 
         {/* タイプ相性 */}
-        <PokemonTypeEffectivenessPanel typeEffectiveness={details.typeEffectiveness} panelClassName={panelClassName} />
+        <PokemonTypeEffectivenessPanel typeEffectiveness={details.typeEffectiveness} panelClassName={`${activeTab === "typeEffectiveness" ? "" : "hidden md:block"} ${panelClassName}`} />
       </div>
 
       {/* 覚える技 */}
-      <div className="md:col-span-2 lg:col-span-1 lg:row-span-2 lg:relative">
+      <div className={`${activeTab === "moves" ? "" : "hidden md:block"} md:col-span-2 lg:col-span-1 lg:row-span-2 lg:relative`}>
         {isMovesLoading && <p>技データを読み込み中...</p>}
         {isMovesError && <p className="text-red-200">技の取得に失敗しました</p>}
         {moves && <PokemonMovesPanel pokemonMoves={moves} panelClassName={`${panelClassName} lg:absolute lg:inset-0 lg:flex lg:flex-col`} />}
