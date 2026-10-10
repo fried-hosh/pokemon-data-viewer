@@ -106,11 +106,25 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       </section>
 
       {/* タブ切り替えボタン */}
-      <div className="md:hidden flex gap-7 p-3 border w-fit justify-self-center">
+      <div
+        className="md:hidden grid grid-cols-3 p-2 shadow-inner
+            w-full max-w-md justify-self-center
+            border rounded-full border-olive-50 dark:border-slate-400
+            bg-black/5 dark:bg-white/10
+            "
+      >
         {detailTabs.map(({ id, label }) => (
-          <button key={id} type="button" onClick={() => setActiveTab(id)} className="relative p-1">
-            {activeTab === id && <motion.span layoutId="detail-tab-button" className="absolute inset-0 rounded-full bg-pink-200/80" />}
-            <span className="relative z-10">{label}</span>
+          <button key={id} type="button" onClick={() => setActiveTab(id)} className="relative px-3 py-1">
+            {activeTab === id && (
+              <motion.span
+                layoutId="detail-tab-button"
+                className="absolute inset-0 rounded-2xl
+                bg-linear-to-b from-olive-300 to-olive-100
+                dark:from-amber-500 dark:to-amber-400
+                "
+              />
+            )}
+            <span className="relative z-10 sm:text-lg font-bold dark:text-white">{label}</span>
           </button>
         ))}
       </div>
@@ -120,8 +134,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       <div className={`flex flex-col gap-4 ${activeTab === "moves" ? "hidden md:flex" : ""}`}>
         <section className={`${activeTab === "stats" ? "" : "hidden md:block"} ${panelClassName}`}>
           <div className="flex justify-between items-center">
-            <h2>種族値</h2>
-            <span>
+            <h2 className="hidden md:block">種族値</h2>
+            <span className="ml-auto">
               合計
               <strong> {totalStats}</strong>
             </span>

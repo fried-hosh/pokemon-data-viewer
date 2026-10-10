@@ -109,8 +109,8 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
     <section className={`${panelClassName}`}>
       {/* タイトル 対象作品名 */}
       <div className="mb-3 flex justify-between items-center border-slate-400">
-        <h2>覚える技</h2>
-        {displayVersionName !== undefined && <span className="font-bold">{`${versionGroupMap[displayVersionName] ?? displayVersionName}`}</span>}
+        <h2 className="hidden md:block">覚える技</h2>
+        {displayVersionName !== undefined && <span className="font-bold ml-auto">{`${versionGroupMap[displayVersionName] ?? displayVersionName}`}</span>}
       </div>
 
       {/* 技一覧 */}
