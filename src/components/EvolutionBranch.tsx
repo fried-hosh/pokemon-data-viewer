@@ -99,13 +99,19 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
     };
   }, [measureLine]);
 
+  // 根本のポケモンかどうか
+  // - 進化先のliはsubgridを用いてulのgridで横に並べ、条件文の量で縦列のUIがずれないようにする
+  // - 根本にはgridが適用されないため、flexに分岐させる
+  const isRoot = currentPath === undefined;
+
   return (
     <li
-      className="relative flex items-center
+      className={`relative items-center
+      ${isRoot ? "flex" : "grid grid-cols-subgrid col-span-full"}
       after:absolute after:top-0 after:bottom-0 after:left-0 after:w-0.5 after:bg-slate-400
       first:after:top-1/2
       last:after:bottom-1/2
-      only:after:hidden"
+      only:after:hidden`}
     >
       {/* 進化条件 */}
       {currentConditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
@@ -163,7 +169,8 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
               {/* 分岐の縦線 */}
               {selectedLinePosition !== null && <span aria-hidden="true" className={`absolute left-0 w-0.5 z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}`} style={{ height: selectedLinePosition.height, top: selectedLinePosition.top }} />}
               {/* 再帰呼び出し */}
-              <ul ref={branchListRef}>
+              {/* gridの 6 は li の直下の要素の数（線・進化条件・線・ボタン・線・その先）*/}
+              <ul ref={branchListRef} className="grid grid-cols-[repeat(6,auto)]">
                 {branchPaths.map((path) => (
                   <EvolutionBranch key={path.to.name} startPokemonName={path.to.name} evolutionPaths={evolutionPaths} evolutionArtworks={evolutionArtworks} onSelect={onSelect} isPending={isPending} selectedPokemonName={selectedPokemonName} selectedPaths={selectedPaths} />
                 ))}
