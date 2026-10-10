@@ -74,7 +74,7 @@ const PokemonEvolutionPanel = ({ details, panelClassName, mobileDialogRef }: Evo
 
   return (
     <>
-      {/* モバイル版 */}
+      {/* モバイルモーダル */}
       <dialog
         aria-label="進化表"
         ref={mobileDialogRef}

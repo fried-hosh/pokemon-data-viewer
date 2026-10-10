@@ -24,6 +24,17 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
     { id: "typeEffectiveness", label: "タイプ相性" },
     { id: "moves", label: "覚える技" },
   ];
+  // 表示するポケモンが変わったら、モバイルのタブを種族値に戻す
+  // - キャッシュがあるとそのコンポーネントは作り直されず、前回選択していたタブの状態が残ってしまうため
+  // - key={pokemonName} で作り直すと進化表での選択時にモーダルが閉じられてしまう
+  // - イベントハンドラではブラウザの 戻る/進む に対応ができない
+  // - useEffectでは古いタブの状態が一瞬描画されてしまう
+  // 以上の理由からdetails.nameを用いた描画中の状態変更を行う
+  const [prevPokemonName, setPrevPokemonName] = useState(details.name);
+  if (prevPokemonName !== details.name) {
+    setPrevPokemonName(details.name);
+    setActiveTab("stats");
+  }
 
   // 合計種族値
   const totalStats = details.stats
