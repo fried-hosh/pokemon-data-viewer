@@ -5,6 +5,7 @@ import PokemonEvolutionPanel from "./PokemonEvolutionPanel";
 import PokemonTypeEffectivenessPanel from "./PokemonTypeEffectivenessPanel";
 import PokemonMovesPanel from "./PokemonMovesPanel";
 import type { PokemonMoveItem } from "../api/getPokemonMoves";
+import { motion } from "motion/react";
 
 type Props = {
   details: PokemonDetails;
@@ -18,6 +19,11 @@ type DetailTab = "stats" | "typeEffectiveness" | "moves";
 const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Props) => {
   // モバイルでのタブ切り替え
   const [activeTab, setActiveTab] = useState<DetailTab>("stats");
+  const detailTabs: { id: DetailTab; label: string }[] = [
+    { id: "stats", label: "種族値" },
+    { id: "typeEffectiveness", label: "タイプ相性" },
+    { id: "moves", label: "覚える技" },
+  ];
 
   // 合計種族値
   const totalStats = details.stats
@@ -100,16 +106,13 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       </section>
 
       {/* タブ切り替えボタン */}
-      <div className="md:hidden flex justify-start gap-7 ml-3">
-        <button type="button" onClick={() => setActiveTab("stats")}>
-          種族値
-        </button>
-        <button type="button" onClick={() => setActiveTab("typeEffectiveness")}>
-          タイプ相性
-        </button>
-        <button type="button" onClick={() => setActiveTab("moves")}>
-          覚える技
-        </button>
+      <div className="md:hidden flex gap-7 p-3 border w-fit justify-self-center">
+        {detailTabs.map(({ id, label }) => (
+          <button key={id} type="button" onClick={() => setActiveTab(id)} className="relative p-1">
+            {activeTab === id && <motion.span layoutId="detail-tab-button" className="absolute inset-0 rounded-full bg-pink-200/80" />}
+            <span className="relative z-10">{label}</span>
+          </button>
+        ))}
       </div>
 
       {/* 種族値 */}
