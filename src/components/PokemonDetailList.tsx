@@ -120,8 +120,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       <div
         className="md:hidden grid grid-cols-3 p-2 shadow-inner
             w-full max-w-md justify-self-center
-            border rounded-full border-olive-50 dark:border-slate-400
-            bg-black/5 dark:bg-white/10
+            border rounded-full border-olive-300 dark:border-white/10
+            bg-black/5 dark:bg-black/30
             "
       >
         {detailTabs.map(({ id, label }) => (
@@ -131,11 +131,17 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                 layoutId="detail-tab-button"
                 className="absolute inset-0 rounded-2xl
                 bg-linear-to-b from-olive-300 to-olive-100
-                dark:from-amber-500 dark:to-amber-400
+                dark:from-slate-700 dark:to-slate-600
                 "
               />
             )}
-            <span className="relative z-10 sm:text-lg font-bold dark:text-white">{label}</span>
+            <span
+              className={`relative z-10 sm:text-lg font-bold
+                  ${activeTab === id ? "text-pink-400 dark:text-amber-400" : "dark:text-white"}
+                  `}
+            >
+              {label}
+            </span>
           </button>
         ))}
       </div>
@@ -158,8 +164,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                 <li key={stat.name} className="flex justify-between items-center">
                   <span className="w-36 shrink-0">{stat.name}</span>
                   {/* ゲージ */}
-                  <div className="h-2 flex-1 rounded-full bg-slate-200">
-                    <div className="h-full rounded-full bg-orange-400" style={{ width: `${percentage}%` }} />
+                  <div className="h-2 flex-1 rounded-full bg-olive-350 dark:bg-slate-200">
+                    <div className="h-full rounded-full bg-pink-400 dark:bg-orange-400" style={{ width: `${percentage}%` }} />
                   </div>
                   <span className="w-10 shrink-0 text-right tabular-nums">{stat.baseStat}</span>
                 </li>

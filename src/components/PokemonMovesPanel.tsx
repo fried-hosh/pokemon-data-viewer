@@ -129,7 +129,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
               className="
               sticky top-0 z-10 py-2
               bg-slate-50/50 dark:bg-slate-900/50
-              mb-3 border-l-3 border-amber-400 pl-3 font-semibold text-lg text-slate-800 dark:text-slate-300
+              mb-3 border-l-3 border-pink-400 dark:border-amber-400 pl-3 font-semibold text-lg text-slate-800 dark:text-slate-300
 
               "
             >
