@@ -51,6 +51,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
   // 進化表のモーダル
   const evolutionDialogRef = useRef<HTMLDialogElement>(null);
 
+  const hasEvolution = details.evolutionPaths.length !== 0;
+
   return (
     <div
       className="grid grid-cols-1 gap-4 p-4
@@ -78,21 +80,25 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
               })}
             </ul>
             {/* 進化表モーダル */}
-            <button
-              type="button"
-              className="
+            {hasEvolution ? (
+              <button
+                type="button"
+                className="
               inline-flex items-center gap-2
-              lg:hidden self-start mt-2 rounded-xl border border-(--border)
-              bg-lime-600/80 dark:bg-white/10 px-3 py-2 shadow-sm
-              transition hover:bg-lime-600 dark:hover:bg-white/25 active:scale-95
-              font-semibold text-white
-              bg-linear-to-br from-amber-500/80 dark:bg-linear-to-tr dark:from-white/40 dark:to-70%
+              lg:hidden self-start rounded-xl border border-(--border)
+              px-3 py-2 shadow-sm text-white dark:text-white font-semibold
+              bg-olive-400 hover:bg-olive-500
+              dark:bg-slate-800 dark:hover:bg-white/15
+              transition active:scale-95
               "
-              onClick={() => evolutionDialogRef.current?.showModal()}
-            >
-              進化表を見る
-              <span aria-hidden="true">›</span>
-            </button>
+                onClick={() => evolutionDialogRef.current?.showModal()}
+              >
+                進化表を見る
+                <span aria-hidden="true">›</span>
+              </button>
+            ) : (
+              <p className="lg:hidden self-start rounded-xl px-3 py-2 font-semibold border border-slate-300 border-dashed text-slate-400 bg-olive-200 dark:bg-slate-600 cursor-default select-none">進化 : なし</p>
+            )}
           </div>
         </div>
 
