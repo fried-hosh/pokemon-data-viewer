@@ -48,7 +48,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
   const hasSelectedPath = branchPaths.some((path) => selectedPaths.some((selectedPath) => selectedPath === path));
 
   // 横線クラス
-  const currentPathBarClassName = `h-0.5 w-8  ${isCurrentPathSelected ? `relative z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}` : "bg-slate-400"}`;
+  const currentPathBarClassName = `h-0.5 w-6  ${isCurrentPathSelected ? `relative z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}` : "bg-slate-400"}`;
 
   // 縦線の着色をするため、要素の中心までの高さを取る
   const targetBranchIndex = branchPaths.findIndex((path) => selectedPaths.some((selectedPath) => selectedPath === path));
@@ -115,20 +115,24 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
     >
       {/* 進化条件 */}
       {currentConditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
-      <div className={`${isSelected ? SELECTED_POKEMON_TEXT_CLASS_NAME : ""}`}>
-        {currentConditions !== null &&
-          currentConditions.map((conditions, index) => (
-            <Fragment key={index}>
-              {index > 0 && <p className="text-center p-1">または</p>}
-              {formatEvolutionConditions(conditions).map((condition) => (
-                <p key={`${index}-${condition.key}`}>
-                  {condition.label}:{condition.value}
-                </p>
-              ))}
-            </Fragment>
-          ))}
+      <div className="flex items-center">
+        <div className={`${isSelected ? SELECTED_POKEMON_TEXT_CLASS_NAME : ""}`}>
+          {currentConditions !== null &&
+            currentConditions.map((conditions, index) => (
+              <Fragment key={index}>
+                {index > 0 && <p className="text-center p-1">または</p>}
+                {formatEvolutionConditions(conditions).map((condition) => (
+                  // 条件文
+                  <p key={`${index}-${condition.key}`} className="flex flex-wrap">
+                    <span className={`${isSelected ? "text-red-400 dark:text-amber-100" : ""} whitespace-nowrap`}>{condition.label}: </span>
+                    <span>{condition.value}</span>
+                  </p>
+                ))}
+              </Fragment>
+            ))}
+        </div>
+        {currentConditions !== null && <span aria-hidden="true" className={`${currentPathBarClassName} flex-1 min-w-6`} />}
       </div>
-      {currentConditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
 
       {/* 名前・スプライト */}
       <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
@@ -169,8 +173,8 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
               {/* 分岐の縦線 */}
               {selectedLinePosition !== null && <span aria-hidden="true" className={`absolute left-0 w-0.5 z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}`} style={{ height: selectedLinePosition.height, top: selectedLinePosition.top }} />}
               {/* 再帰呼び出し */}
-              {/* gridの 6 は li の直下の要素の数（線・進化条件・線・ボタン・線・その先）*/}
-              <ul ref={branchListRef} className="grid grid-cols-[repeat(6,auto)]">
+              {/* gridの 5 は li の直下の要素の数（線, 進化条件&線, ボタン. 線, その先） */}
+              <ul ref={branchListRef} className="grid grid-cols-[repeat(5,auto)]">
                 {branchPaths.map((path) => (
                   <EvolutionBranch key={path.to.name} startPokemonName={path.to.name} evolutionPaths={evolutionPaths} evolutionArtworks={evolutionArtworks} onSelect={onSelect} isPending={isPending} selectedPokemonName={selectedPokemonName} selectedPaths={selectedPaths} />
                 ))}
