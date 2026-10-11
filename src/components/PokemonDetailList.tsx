@@ -57,7 +57,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
          md:grid-cols-2 lg:grid-cols-[1fr_0.8fr_1fr] "
     >
       {/* 基本情報 - 名前、画像、タイプ、特性、進化表モーダル */}
-      <section className={panelClassName}>
+      {/* 進化表のみをスクロールアンカーの候補にすることで、特性欄の行数変化によるカーソルのずれをなくす */}
+      <section className={`[overflow-anchor:none] ${panelClassName}`}>
         <div className="grid grid-cols-2 gap-4">
           {details.imageUrl !== null && <img className="mx-auto size-30 md:size-48 object-contain" src={details.imageUrl} alt={details.name} />}
           <div className="flex flex-col gap-2">
@@ -146,9 +147,10 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         ))}
       </div>
 
-      {/* 種族値 */}
+      {/* 種族値、 タイプ相性 */}
       {/* 技タブが選択された時は hidden にする (空文字だとgap-4が残って技タブ選択時のみ不自然な間が空くため) */}
-      <div className={`flex flex-col gap-4 ${activeTab === "moves" ? "hidden md:flex" : ""}`}>
+      <div className={`[overflow-anchor:none] flex flex-col gap-4 ${activeTab === "moves" ? "hidden md:flex" : ""}`}>
+        {/* 種族値 */}
         <section className={`${activeTab === "stats" ? "" : "hidden md:block"} ${panelClassName}`}>
           <div className="flex justify-between items-center">
             <h2 className="hidden md:block">種族値</h2>
@@ -179,7 +181,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       </div>
 
       {/* 覚える技 */}
-      <div className={`${activeTab === "moves" ? "" : "hidden md:block"} md:col-span-2 lg:col-span-1 lg:row-span-2 lg:relative`}>
+      <div className={`[overflow-anchor:none] ${activeTab === "moves" ? "" : "hidden md:block"} md:col-span-2 lg:col-span-1 lg:row-span-2 lg:relative`}>
         {isMovesLoading && <p>技データを読み込み中...</p>}
         {isMovesError && <p className="text-red-200">技の取得に失敗しました</p>}
         {moves && <PokemonMovesPanel pokemonMoves={moves} panelClassName={`${panelClassName} lg:absolute lg:inset-0 lg:flex lg:flex-col`} />}
