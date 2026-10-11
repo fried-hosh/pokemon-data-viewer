@@ -135,7 +135,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
       </div>
 
       {/* 名前・スプライト */}
-      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
         {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={startPokemonName} />}
         <span>{startPokemonName}</span>
       </button>
