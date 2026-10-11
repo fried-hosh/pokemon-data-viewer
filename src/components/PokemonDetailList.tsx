@@ -6,6 +6,7 @@ import PokemonTypeEffectivenessPanel from "./PokemonTypeEffectivenessPanel";
 import PokemonMovesPanel from "./PokemonMovesPanel";
 import type { PokemonMoveItem } from "../api/getPokemonMoves";
 import { motion } from "motion/react";
+import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
 
 type Props = {
   details: PokemonDetails;
@@ -42,6 +43,15 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
     .reduce((acc, cur) => {
       return acc + cur;
     }, 0);
+  // 種族値の日本語化
+  const jaNameStats: Record<string, string> = {
+    hp: "HP",
+    attack: "攻撃",
+    defense: "防御",
+    "special-attack": "特攻",
+    "special-defense": "特防",
+    speed: "素早さ",
+  };
 
   // パネルの共通レイアウト
   const panelClassName = "p-3 md:p-5 rounded-2xl border text-left shadow-lg border-(--border) bg-(--code-bg)";
@@ -64,7 +74,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         <div className="grid grid-cols-2 md:grid-cols-[2fr_3fr] lg:grid-cols-2 gap-4">
           {details.imageUrl !== null && <img className="mx-auto size-30 md:size-48 object-contain" src={details.imageUrl} alt={details.name} />}
           <div className="flex flex-col gap-2">
-            <h2>{details.name}</h2>
+            <h2>{pokemonJaNameMap[details.name] ?? details.name}</h2>
             <ul className="flex gap-1 font-bold lg:flex-col lg:items-start">
               {details.types.map((type) => {
                 const typeInfo = pokemonTypeMap[type];
@@ -160,9 +170,9 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         <section className={`${activeTab === "stats" ? "" : "hidden md:block"} ${panelClassName}`}>
           <div className="flex justify-between items-center">
             <h2 className="hidden md:block">種族値</h2>
-            <span className="ml-auto">
-              合計
-              <strong> {totalStats}</strong>
+            <span className="flex gap-2 ml-auto">
+              <span>合計</span>
+              <span className="text-olive-600 dark:text-white font-bold">{totalStats}</span>
             </span>
           </div>
           <ul>
@@ -170,12 +180,12 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
               const percentage = (stat.baseStat / MAX_BASE_STAT) * 100;
               return (
                 <li key={stat.name} className="flex justify-between items-center">
-                  <span className="w-36 shrink-0">{stat.name}</span>
+                  <span className="w-14 shrink-0">{jaNameStats[stat.name]}</span>
+                  <span className="w-12 mr-4 shrink-0 md:text-lg text-olive-600 dark:text-white text-right font-semibold tabular-nums">{stat.baseStat}</span>
                   {/* ゲージ */}
                   <div className="h-2 flex-1 rounded-full bg-olive-350 dark:bg-slate-200">
                     <div className="h-full rounded-full bg-pink-400 dark:bg-orange-400" style={{ width: `${percentage}%` }} />
                   </div>
-                  <span className="w-10 shrink-0 text-right tabular-nums">{stat.baseStat}</span>
                 </li>
               );
             })}

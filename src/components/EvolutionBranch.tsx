@@ -2,6 +2,7 @@ import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react"
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
 import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
+import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
 
 type EvolutionBranchProps = {
   startPokemonName: string;
@@ -137,7 +138,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
       {/* 名前・スプライト */}
       <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
         {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={startPokemonName} />}
-        <span>{startPokemonName}</span>
+        <span>{pokemonJaNameMap[startPokemonName] ?? startPokemonName}</span>
       </button>
 
       {branchPaths.length > 0 && (
