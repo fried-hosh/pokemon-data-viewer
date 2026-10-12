@@ -49,7 +49,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
   const hasSelectedPath = branchPaths.some((path) => selectedPaths.some((selectedPath) => selectedPath === path));
 
   // 横線クラス
-  const currentPathBarClassName = `h-0.5 w-6  ${isCurrentPathSelected ? `relative z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}` : "bg-slate-400"}`;
+  const currentPathBarClassName = `h-0.5 w-3 xl:w-6 ${isCurrentPathSelected ? `relative z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}` : "bg-slate-400"}`;
 
   // 縦線の着色をするため、要素の中心までの高さを取る
   const targetBranchIndex = branchPaths.findIndex((path) => selectedPaths.some((selectedPath) => selectedPath === path));
@@ -105,6 +105,11 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
   // - 根本にはgridが適用されないため、flexに分岐させる
   const isRoot = currentPath === undefined;
 
+  // 名前本文と「（⚪︎⚪︎のすがた）」を区切って改行
+  const jaName = pokemonJaNameMap[startPokemonName] ?? startPokemonName;
+  // 該当しなければ -1
+  const formIndex = jaName.indexOf("（");
+
   return (
     <li
       className={`relative items-center
@@ -124,7 +129,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
                 {index > 0 && <p className="text-center p-1">または</p>}
                 {formatEvolutionConditions(conditions).map((condition) => (
                   // 条件文
-                  <p key={`${index}-${condition.key}`} className="flex flex-wrap">
+                  <p key={`${index}-${condition.key}`} className="flex flex-col">
                     <span className={`${isSelected ? "text-red-400 dark:text-amber-100" : ""} whitespace-nowrap`}>{condition.label}: </span>
                     <span>{condition.value}</span>
                   </p>
@@ -132,18 +137,28 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
               </Fragment>
             ))}
         </div>
-        {currentConditions !== null && <span aria-hidden="true" className={`${currentPathBarClassName} flex-1 min-w-6`} />}
+        {currentConditions !== null && <span aria-hidden="true" className={`${currentPathBarClassName} flex-1 min-w-3 xl:min-w-6`} />}
       </div>
 
       {/* 名前・スプライト */}
-      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
-        {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={startPokemonName} />}
-        <span>{pokemonJaNameMap[startPokemonName] ?? startPokemonName}</span>
+      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 px-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+        {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
+        {/* 名前にカッコが含まれていれば折り返して表示 */}
+        <span className="text-sm xl:text-base whitespace-nowrap">
+          {formIndex !== -1 ? (
+            <>
+              <span className="block">{jaName.slice(0, formIndex)}</span>
+              <span>{jaName.slice(formIndex)}</span>
+            </>
+          ) : (
+            jaName
+          )}
+        </span>
       </button>
 
       {branchPaths.length > 0 && (
         <>
-          <span aria-hidden="true" className={`h-0.5 w-8 ${hasSelectedPath ? SELECTED_POKEMON_BAR_CLASS_NAME : "bg-slate-400"}`} />
+          <span aria-hidden="true" className={`h-0.5 w-3 xl:w-8 ${hasSelectedPath ? SELECTED_POKEMON_BAR_CLASS_NAME : "bg-slate-400"}`} />
 
           {/* 4分岐以上かつ1進化（イーブイ）でのみ特殊レイアウト */}
           {useManyBranchGrid ? (
@@ -154,8 +169,8 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
                 return (
                   <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 ml-2 mr-2 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
                     <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending}>
-                      {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={path.to.name} />}
-                      <span>{path.to.name}</span>
+                      {sprite !== null && <img className="size-24 object-contain" src={sprite} alt={path.to.name} />}
+                      <span>{pokemonJaNameMap[path.to.name] ?? path.to.name}</span>
                     </button>
                     {path.evoDetails.map((conditions, index) =>
                       formatEvolutionConditions(conditions).map((condition) => (
