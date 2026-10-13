@@ -191,7 +191,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
                       </button>
                       {path.evoDetails.map((conditions, index) =>
                         formatEvolutionConditions(conditions).map((condition) => (
-                          <span key={`${index}-${condition.key}`} className="text-sm text-center">
+                          <span key={`${index}-${condition.key}`} className="text-base text-center">
                             <span className={`block ${isBranchSelected ? "text-red-400 dark:text-amber-100" : ""}`}>{condition.label}:</span>
                             <span className="whitespace-nowrap">{condition.value}</span>
                           </span>
