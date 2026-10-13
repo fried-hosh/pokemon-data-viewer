@@ -141,48 +141,67 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
       </div>
 
       {/* 名前・スプライト */}
-      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 px-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
-        {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
-        {/* 名前にカッコが含まれていれば折り返して表示 */}
-        <span className="text-sm xl:text-base whitespace-nowrap">
-          {formIndex !== -1 ? (
-            <>
-              <span className="block">{jaName.slice(0, formIndex)}</span>
-              <span>{jaName.slice(formIndex)}</span>
-            </>
-          ) : (
-            jaName
-          )}
-        </span>
-      </button>
+      {!useManyBranchGrid && (
+        <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 px-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+          {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
+          {/* 名前にカッコが含まれていれば折り返して表示 */}
+          <span className="text-sm xl:text-base whitespace-nowrap">
+            {formIndex !== -1 ? (
+              <>
+                <span className="block">{jaName.slice(0, formIndex)}</span>
+                <span>{jaName.slice(formIndex)}</span>
+              </>
+            ) : (
+              jaName
+            )}
+          </span>
+        </button>
+      )}
 
       {branchPaths.length > 0 && (
         <>
-          <span aria-hidden="true" className={`h-0.5 w-3 xl:w-8 ${hasSelectedPath ? SELECTED_POKEMON_BAR_CLASS_NAME : "bg-slate-400"}`} />
+          {!useManyBranchGrid && <span aria-hidden="true" className={`h-0.5 w-3 xl:w-8 ${hasSelectedPath ? SELECTED_POKEMON_BAR_CLASS_NAME : "bg-slate-400"}`} />}
 
           {/* 4分岐以上かつ1進化（イーブイ）でのみ特殊レイアウト */}
+          {/* 親を見出しにして、進化先を4列で並べる */}
           {useManyBranchGrid ? (
-            <ul className="grid grid-cols-3 border-2 rounded-xl gap-2 p-2 bg-amber-50/60 dark:bg-white/5 shadow-lg">
-              {branchPaths.map((path) => {
-                const sprite = getSprite(path.to.name);
-                const isBranchSelected = selectedPokemonName === path.to.name;
-                return (
-                  <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 ml-2 mr-2 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
-                    <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending}>
-                      {sprite !== null && <img className="size-24 object-contain" src={sprite} alt={path.to.name} />}
-                      <span>{pokemonJaNameMap[path.to.name] ?? path.to.name}</span>
-                    </button>
-                    {path.evoDetails.map((conditions, index) =>
-                      formatEvolutionConditions(conditions).map((condition) => (
-                        <span key={`${index}-${condition.key}`}>
-                          {condition.label}:{condition.value}
-                        </span>
-                      )),
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="flex-1 p-2">
+              {/* 見出し */}
+              <div className="grid grid-cols-4 gap-2 items-center mb-3">
+                <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`flex flex-col items-center p-2 gap-1 mr-2 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+                  {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
+                </button>
+                <div className="flex flex-col">
+                  <button type="button" onClick={() => onSelect(startPokemonName)} tabIndex={-1} disabled={isPending} className="self-start">
+                    <span className={`text-xl ${isSelected ? `${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>{jaName}</span>
+                  </button>
+                  <span>進化数: {branchPaths.length}</span>
+                </div>
+              </div>
+              {/* シャワーズ等の分岐先 */}
+              <ul className="grid grid-cols-4 gap-2 border-t pt-3">
+                {branchPaths.map((path) => {
+                  const sprite = getSprite(path.to.name);
+                  const isBranchSelected = selectedPokemonName === path.to.name;
+                  return (
+                    <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 mb-1 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+                      <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending}>
+                        {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={path.to.name} />}
+                        <span>{pokemonJaNameMap[path.to.name] ?? path.to.name}</span>
+                      </button>
+                      {path.evoDetails.map((conditions, index) =>
+                        formatEvolutionConditions(conditions).map((condition) => (
+                          <span key={`${index}-${condition.key}`} className="text-sm text-center">
+                            <span className={`block ${isBranchSelected ? "text-red-400 dark:text-amber-100" : ""}`}>{condition.label}:</span>
+                            <span className="whitespace-nowrap">{condition.value}</span>
+                          </span>
+                        )),
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           ) : (
             // 通常レイアウト
             <div className="relative">
