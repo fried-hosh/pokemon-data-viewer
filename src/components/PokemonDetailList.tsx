@@ -129,7 +129,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                       {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
                     </div>
 
-                    <span className="text-sm md:text-base text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "日本語の説明文がありません"}</span>
+                    <span className="text-sm md:text-base text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "未登録"}</span>
                   </div>
                 </li>
               ))}
