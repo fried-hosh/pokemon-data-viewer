@@ -2,6 +2,7 @@ import { Fragment } from "react/jsx-runtime";
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
 import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
+import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
 
 type MobileEvolutionBranchProps = {
   startPokemonName: string;
@@ -43,7 +44,7 @@ const MobileEvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtw
           className={`mt-1 mb-1 p-1 pointer-coarse:outline-none
         ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}
         >
-          <span>{startPokemonName}</span>
+          <span>{pokemonJaNameMap[startPokemonName] ?? startPokemonName}</span>
           {sprite !== null && <img className="size-18" src={sprite} alt={startPokemonName} />}
         </button>
         {/* 進化条件 */}

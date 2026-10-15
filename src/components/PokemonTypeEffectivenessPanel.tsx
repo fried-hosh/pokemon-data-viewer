@@ -17,7 +17,7 @@ const PokemonTypeEffectivenessPanel = ({ typeEffectiveness, panelClassName }: Pr
 
   return (
     <section className={`${panelClassName} flex-1`}>
-      <h2>タイプ相性</h2>
+      <h2 className="hidden md:block">タイプ相性</h2>
       {typeEffectiveness !== null &&
         typeEffectiveness.map(({ multiplier, types }) => (
           <div key={multiplier} className="flex gap-3 py-2">

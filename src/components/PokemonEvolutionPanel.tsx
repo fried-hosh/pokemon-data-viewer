@@ -4,6 +4,7 @@ import EvolutionBranch from "./EvolutionBranch";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import MobileEvolutionBranch from "./MobileEvolutionBranch";
+import LoadingSpinner from "./LoadingSpinner";
 
 type EvolutionPanelProps = {
   details: PokemonDetails;
@@ -72,9 +73,12 @@ const PokemonEvolutionPanel = ({ details, panelClassName, mobileDialogRef }: Evo
     };
   }, [mobileDialogRef]);
 
+  const hasEvolution = details.evolutionPaths.length !== 0;
+
   return (
     <>
       {/* モバイル版 */}
+      {/* モーダル */}
       <dialog
         aria-label="進化表"
         ref={mobileDialogRef}
@@ -117,7 +121,7 @@ const PokemonEvolutionPanel = ({ details, panelClassName, mobileDialogRef }: Evo
         <div className="pointer-events-none absolute top-2 right-2 z-20" aria-live="polite">
           {selectionStatus === "pending" && (
             <span className="flex items-center gap-2">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-orange-500" aria-hidden="true" />
+              <LoadingSpinner size="sm" />
               <span>更新中...</span>
             </span>
           )}
@@ -126,27 +130,33 @@ const PokemonEvolutionPanel = ({ details, panelClassName, mobileDialogRef }: Evo
       </dialog>
 
       {/* PC版 */}
+      {hasEvolution ? (
+        <section className={`hidden lg:block ${panelClassName}`}>
+          {/* スピナー */}
+          <div className="flex min-h-6 justify-end" aria-live="polite">
+            {selectionStatus === "pending" && (
+              <span className="flex items-center gap-2">
+                <LoadingSpinner size="sm" />
+                <span>更新中...</span>
+              </span>
+            )}
+            {selectionStatus === "error" && <p className="text-red-500">取得に失敗しました</p>}
+          </div>
 
-      <section className={`hidden lg:block ${panelClassName}`}>
-        {/* スピナー */}
-        <div className="flex min-h-6 justify-end" aria-live="polite">
-          {selectionStatus === "pending" && (
-            <span className="flex items-center gap-2">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-orange-500" aria-hidden="true" />
-              <span>更新中...</span>
-            </span>
-          )}
-          {selectionStatus === "error" && <p className="text-red-500">取得に失敗しました</p>}
+          <h2 className="sr-only">進化表</h2>
+
+          <div className="hidden lg:block overflow-auto">
+            <ul className="p-1 min-w-max lg:min-w-0">
+              <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} selectedPaths={selectedPaths} />
+            </ul>
+          </div>
+        </section>
+      ) : (
+        <div className={`${panelClassName} hidden lg:grid lg:grid-cols-1 items-center`}>
+          <h2 className="sr-only">進化表</h2>
+          <span className="text-center text-lg">進化なし</span>
         </div>
-
-        <h2 className="sr-only">進化表</h2>
-
-        <div className="hidden lg:block overflow-auto">
-          <ul className="p-1 min-w-max lg:min-w-0">
-            <EvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} selectedPaths={selectedPaths} />
-          </ul>
-        </div>
-      </section>
+      )}
     </>
   );
 };

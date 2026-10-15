@@ -2,6 +2,7 @@ import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react"
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
 import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
+import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
 
 type EvolutionBranchProps = {
   startPokemonName: string;
@@ -48,7 +49,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
   const hasSelectedPath = branchPaths.some((path) => selectedPaths.some((selectedPath) => selectedPath === path));
 
   // 横線クラス
-  const currentPathBarClassName = `h-0.5 w-8  ${isCurrentPathSelected ? `relative z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}` : "bg-slate-400"}`;
+  const currentPathBarClassName = `h-0.5 w-3 xl:w-6 ${isCurrentPathSelected ? `relative z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}` : "bg-slate-400"}`;
 
   // 縦線の着色をするため、要素の中心までの高さを取る
   const targetBranchIndex = branchPaths.findIndex((path) => selectedPaths.some((selectedPath) => selectedPath === path));
@@ -99,71 +100,116 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
     };
   }, [measureLine]);
 
+  // 根本のポケモンかどうか
+  // - 進化先のliはsubgridを用いてulのgridで横に並べ、条件文の量で縦列のUIがずれないようにする
+  // - 根本にはgridが適用されないため、flexに分岐させる
+  const isRoot = currentPath === undefined;
+
+  // 名前本文と「（⚪︎⚪︎のすがた）」を区切って改行
+  const jaName = pokemonJaNameMap[startPokemonName] ?? startPokemonName;
+  // 該当しなければ -1
+  const formIndex = jaName.indexOf("（");
+
   return (
     <li
-      className="relative flex items-center
+      className={`relative items-center
+      ${isRoot ? "flex" : "grid grid-cols-subgrid col-span-full"}
       after:absolute after:top-0 after:bottom-0 after:left-0 after:w-0.5 after:bg-slate-400
       first:after:top-1/2
       last:after:bottom-1/2
-      only:after:hidden"
+      only:after:hidden`}
     >
       {/* 進化条件 */}
       {currentConditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
-      <div className={`${isSelected ? SELECTED_POKEMON_TEXT_CLASS_NAME : ""}`}>
-        {currentConditions !== null &&
-          currentConditions.map((conditions, index) => (
-            <Fragment key={index}>
-              {index > 0 && <p className="text-center p-1">または</p>}
-              {formatEvolutionConditions(conditions).map((condition) => (
-                <p key={`${index}-${condition.key}`}>
-                  {condition.label}:{condition.value}
-                </p>
-              ))}
-            </Fragment>
-          ))}
+      <div className="flex items-center">
+        <div className={`${isSelected ? SELECTED_POKEMON_TEXT_CLASS_NAME : ""}`}>
+          {currentConditions !== null &&
+            currentConditions.map((conditions, index) => (
+              <Fragment key={index}>
+                {index > 0 && <p className="text-center p-1">または</p>}
+                {formatEvolutionConditions(conditions).map((condition) => (
+                  // 条件文
+                  <p key={`${index}-${condition.key}`} className="flex flex-col">
+                    <span className={`${isSelected ? "text-red-400 dark:text-amber-100" : ""} whitespace-nowrap`}>{condition.label}: </span>
+                    <span>{condition.value}</span>
+                  </p>
+                ))}
+              </Fragment>
+            ))}
+        </div>
+        {currentConditions !== null && <span aria-hidden="true" className={`${currentPathBarClassName} flex-1 min-w-3 xl:min-w-6`} />}
       </div>
-      {currentConditions !== null && <span aria-hidden="true" className={currentPathBarClassName} />}
 
       {/* 名前・スプライト */}
-      <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
-        {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={startPokemonName} />}
-        <span>{startPokemonName}</span>
-      </button>
+      {!useManyBranchGrid && (
+        <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 px-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+          {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
+          {/* 名前にカッコが含まれていれば折り返して表示 */}
+          <span className="text-sm xl:text-base whitespace-nowrap">
+            {formIndex !== -1 ? (
+              <>
+                <span className="block">{jaName.slice(0, formIndex)}</span>
+                <span>{jaName.slice(formIndex)}</span>
+              </>
+            ) : (
+              jaName
+            )}
+          </span>
+        </button>
+      )}
 
       {branchPaths.length > 0 && (
         <>
-          <span aria-hidden="true" className={`h-0.5 w-8 ${hasSelectedPath ? SELECTED_POKEMON_BAR_CLASS_NAME : "bg-slate-400"}`} />
+          {!useManyBranchGrid && <span aria-hidden="true" className={`h-0.5 w-3 xl:w-8 ${hasSelectedPath ? SELECTED_POKEMON_BAR_CLASS_NAME : "bg-slate-400"}`} />}
 
           {/* 4分岐以上かつ1進化（イーブイ）でのみ特殊レイアウト */}
+          {/* 親を見出しにして、進化先を4列で並べる */}
           {useManyBranchGrid ? (
-            <ul className="grid grid-cols-3 border-2 rounded-xl gap-2 p-2 bg-amber-50/60 dark:bg-white/5 shadow-lg">
-              {branchPaths.map((path) => {
-                const sprite = getSprite(path.to.name);
-                const isBranchSelected = selectedPokemonName === path.to.name;
-                return (
-                  <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 ml-2 mr-2 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
-                    <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending}>
-                      {sprite !== null && <img className="h-24 w-24 object-contain" src={sprite} alt={path.to.name} />}
-                      <span>{path.to.name}</span>
-                    </button>
-                    {path.evoDetails.map((conditions, index) =>
-                      formatEvolutionConditions(conditions).map((condition) => (
-                        <span key={`${index}-${condition.key}`}>
-                          {condition.label}:{condition.value}
-                        </span>
-                      )),
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="flex-1 p-2">
+              {/* 見出し */}
+              <div className="grid grid-cols-4 gap-2 items-center mb-3">
+                <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`flex flex-col items-center p-2 gap-1 mr-2 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+                  {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
+                </button>
+                <div className="flex flex-col">
+                  <button type="button" onClick={() => onSelect(startPokemonName)} tabIndex={-1} disabled={isPending} className="self-start">
+                    <span className={`text-xl ${isSelected ? `${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>{jaName}</span>
+                  </button>
+                  <span>進化数: {branchPaths.length}</span>
+                </div>
+              </div>
+              {/* シャワーズ等の分岐先 */}
+              <ul className="grid grid-cols-4 gap-2 border-t pt-3">
+                {branchPaths.map((path) => {
+                  const sprite = getSprite(path.to.name);
+                  const isBranchSelected = selectedPokemonName === path.to.name;
+                  return (
+                    <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 mb-1 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+                      <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending}>
+                        {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={path.to.name} />}
+                        <span>{pokemonJaNameMap[path.to.name] ?? path.to.name}</span>
+                      </button>
+                      {path.evoDetails.map((conditions, index) =>
+                        formatEvolutionConditions(conditions).map((condition) => (
+                          <span key={`${index}-${condition.key}`} className="text-base text-center">
+                            <span className={`block ${isBranchSelected ? "text-red-400 dark:text-amber-100" : ""}`}>{condition.label}:</span>
+                            <span className="whitespace-nowrap">{condition.value}</span>
+                          </span>
+                        )),
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           ) : (
             // 通常レイアウト
             <div className="relative">
               {/* 分岐の縦線 */}
               {selectedLinePosition !== null && <span aria-hidden="true" className={`absolute left-0 w-0.5 z-10 ${SELECTED_POKEMON_BAR_CLASS_NAME}`} style={{ height: selectedLinePosition.height, top: selectedLinePosition.top }} />}
               {/* 再帰呼び出し */}
-              <ul ref={branchListRef}>
+              {/* gridの 5 は li の直下の要素の数（線, 進化条件&線, ボタン. 線, その先） */}
+              <ul ref={branchListRef} className="grid grid-cols-[repeat(5,auto)]">
                 {branchPaths.map((path) => (
                   <EvolutionBranch key={path.to.name} startPokemonName={path.to.name} evolutionPaths={evolutionPaths} evolutionArtworks={evolutionArtworks} onSelect={onSelect} isPending={isPending} selectedPokemonName={selectedPokemonName} selectedPaths={selectedPaths} />
                 ))}
