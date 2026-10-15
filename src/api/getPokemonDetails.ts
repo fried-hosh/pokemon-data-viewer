@@ -591,16 +591,16 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
 
   // 特性の名前と説明文をインデックスで対応させる
   const abilityDetails = abilityDetailsData.map((abilityData) => {
-    const description = abilityData.flavor_text_entries.filter((entry) => entry.language.name === "ja").at(-1)?.flavor_text ?? null;
-    const jaName = abilityData.names.find((name) => name.language.name === "ja-hrkt")?.name ?? null;
+    const description = abilityData.flavor_text_entries.filter((entry) => entry.language.name === "ja").at(-1)?.flavor_text ?? abilityData.flavor_text_entries.filter((entry) => entry.language.name === "en").at(-1)?.flavor_text ?? null;
+    const displayName = abilityData.names.find((name) => name.language.name === "ja-hrkt")?.name ?? abilityData.names.find((name) => name.language.name === "en")?.name ?? null;
 
-    return { description, jaName };
+    return { description, displayName };
   });
 
   const abilities = pokemonData.abilities.map((ability, index) => {
     const abilityDetail = abilityDetails[index] ?? null;
     return {
-      name: abilityDetail?.jaName ?? null,
+      name: abilityDetail?.displayName ?? null,
       isHidden: ability.is_hidden,
       description: abilityDetail?.description ?? null,
     };
