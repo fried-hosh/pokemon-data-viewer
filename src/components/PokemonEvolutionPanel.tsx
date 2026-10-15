@@ -4,6 +4,7 @@ import EvolutionBranch from "./EvolutionBranch";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import MobileEvolutionBranch from "./MobileEvolutionBranch";
+import LoadingSpinner from "./LoadingSpinner";
 
 type EvolutionPanelProps = {
   details: PokemonDetails;
@@ -120,7 +121,7 @@ const PokemonEvolutionPanel = ({ details, panelClassName, mobileDialogRef }: Evo
         <div className="pointer-events-none absolute top-2 right-2 z-20" aria-live="polite">
           {selectionStatus === "pending" && (
             <span className="flex items-center gap-2">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-orange-500" aria-hidden="true" />
+              <LoadingSpinner size="sm" />
               <span>更新中...</span>
             </span>
           )}
@@ -135,7 +136,7 @@ const PokemonEvolutionPanel = ({ details, panelClassName, mobileDialogRef }: Evo
           <div className="flex min-h-6 justify-end" aria-live="polite">
             {selectionStatus === "pending" && (
               <span className="flex items-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-orange-500" aria-hidden="true" />
+                <LoadingSpinner size="sm" />
                 <span>更新中...</span>
               </span>
             )}

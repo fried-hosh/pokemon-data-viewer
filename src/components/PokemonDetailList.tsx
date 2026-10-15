@@ -7,6 +7,7 @@ import PokemonMovesPanel from "./PokemonMovesPanel";
 import type { PokemonMoveItem } from "../api/getPokemonMoves";
 import { motion } from "motion/react";
 import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
+import LoadingSpinner from "./LoadingSpinner";
 
 type Props = {
   details: PokemonDetails;
@@ -198,7 +199,11 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
 
       {/* 覚える技 */}
       <div className={`[overflow-anchor:none] ${activeTab === "moves" ? "" : "hidden md:block"} md:col-span-2 lg:col-span-1 lg:row-span-2 lg:relative`}>
-        {isMovesLoading && <p>技データを読み込み中...</p>}
+        {isMovesLoading && (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] animate-detail-panel-fade-in [animation-delay:300ms]">
+            <LoadingSpinner size="lg" />
+          </div>
+        )}
         {isMovesError && <p className="text-red-200">技の取得に失敗しました</p>}
         {moves && <PokemonMovesPanel pokemonMoves={moves} panelClassName={`${panelClassName} lg:absolute lg:inset-0 lg:flex lg:flex-col animate-detail-panel-fade-in md:[animation-delay:320ms]`} />}
       </div>
