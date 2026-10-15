@@ -122,61 +122,65 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
       dark:border-slate-600 dark:bg-slate-900/20
       "
       >
-        {sortedAccumulatedMovesArray.map(([learnMethod, moves]) => (
-          <div key={learnMethod} className="pb-3 mb-3 border-b last:border-b-0 border-slate-400">
-            {/* 習得カテゴリ */}
-            <h3
-              className="
+        {pokemonMoves.length === 0 ? (
+          <p className="text-center text-olive-500 dark:text-slate-300">データが追加されていません</p>
+        ) : (
+          sortedAccumulatedMovesArray.map(([learnMethod, moves]) => (
+            <div key={learnMethod} className="pb-3 mb-3 border-b last:border-b-0 border-slate-400">
+              {/* 習得カテゴリ */}
+              <h3
+                className="
               sticky top-0 z-10 py-2
               bg-slate-50/50 dark:bg-slate-900/50
               mb-3 border-l-3 border-pink-400 dark:border-amber-400 pl-3 font-semibold text-lg text-slate-800 dark:text-slate-300
 
               "
-            >
-              {learnMethodMap[learnMethod]}
-            </h3>
-            {moves.map((move) => (
-              <div
-                key={`${move.id}-${move.level ?? "no-level"}`}
-                className="
+              >
+                {learnMethodMap[learnMethod]}
+              </h3>
+              {moves.map((move) => (
+                <div
+                  key={`${move.id}-${move.level ?? "no-level"}`}
+                  className="
                 p-2 mb-2 shadow-sm border
                 border-slate-400/70 bg-amber-100/40
                 dark:border-amber-50/80 dark:bg-amber-100/4 rounded
                 "
-              >
-                {/* mdのみ配置変更 */}
-                <div className="md:grid md:grid-cols-2 md:items-center md:gap-6 lg:block">
-                  {/* 1段目 - レベル 技名 タイプ名 */}
-                  <div className="flex gap-3 items-center">
-                    {learnMethod === "level-up" && <span className="w-12">Lv. {move.level} </span>}
-                    <div className="flex flex-1 items-center justify-between ">
-                      <span className="text-slate-700 dark:text-white">{move.jaName}</span>
-                      <span className={`rounded-xl px-2 py-1 text-white text-sm ${pokemonTypeMap[move.type].bgColorClass}`}>{pokemonTypeMap[move.type].ja}</span>
+                >
+                  {/* mdのみ配置変更 */}
+                  <div className="md:grid md:grid-cols-2 md:items-center md:gap-6 lg:block">
+                    {/* 1段目 - レベル 技名 タイプ名 */}
+                    <div className="flex gap-3 items-center">
+                      {learnMethod === "level-up" && <span className="w-12">Lv. {move.level} </span>}
+                      <div className="flex flex-1 items-center justify-between ">
+                        <span className="text-slate-700 dark:text-white">{move.jaName}</span>
+                        <span className={`rounded-xl px-2 py-1 text-white text-sm ${pokemonTypeMap[move.type].bgColorClass}`}>{pokemonTypeMap[move.type].ja}</span>
+                      </div>
                     </div>
-                  </div>
-                  {/* 2段目 - 技区分 威力 命中 PP*/}
-                  <div className="flex justify-between">
-                    <span>{damageClassMap[move.damageClass]}</span>
-                    <div className="flex gap-4">
-                      <span className="flex justify-between w-16">
-                        <span>威力</span>
-                        <span>{move.power || "―"}</span>
-                      </span>
-                      <span className="flex justify-between w-16">
-                        <span>命中</span>
-                        <span>{move.accuracy || "―"}</span>
-                      </span>
-                      <span className="flex justify-between w-10">
-                        <span>PP</span>
-                        <span>{move.pp || "―"}</span>
-                      </span>
+                    {/* 2段目 - 技区分 威力 命中 PP*/}
+                    <div className="flex justify-between">
+                      <span>{damageClassMap[move.damageClass]}</span>
+                      <div className="flex gap-4">
+                        <span className="flex justify-between w-16">
+                          <span>威力</span>
+                          <span>{move.power || "―"}</span>
+                        </span>
+                        <span className="flex justify-between w-16">
+                          <span>命中</span>
+                          <span>{move.accuracy || "―"}</span>
+                        </span>
+                        <span className="flex justify-between w-10">
+                          <span>PP</span>
+                          <span>{move.pp || "―"}</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))}
+              ))}
+            </div>
+          ))
+        )}
       </div>
     </section>
   );

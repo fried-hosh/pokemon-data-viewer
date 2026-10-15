@@ -116,21 +116,25 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         {/* 特性 */}
         <section className={`${panelClassName} mt-2`}>
           <h2>特性</h2>
-          <ul className="divide-y divide-slate-200 dark:divide-slate-700">
-            {details.abilities.map((ability) => (
-              <li key={ability.name} className="flex flex-col gap-1">
-                <div className="flex flex-col gap-1 py-2 md:py-3">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-base md:text-lg text-slate-700 dark:text-slate-200">{ability.name}</span>
+          {details.abilities.length === 0 ? (
+            <p className="text-olive-500 dark:text-slate-300">データが追加されていません</p>
+          ) : (
+            <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+              {details.abilities.map((ability) => (
+                <li key={ability.name} className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 py-2 md:py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-base md:text-lg text-slate-700 dark:text-slate-200">{ability.name}</span>
 
-                    {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
+                      {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
+                    </div>
+
+                    <span className="text-sm md:text-base text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "日本語の説明文がありません"}</span>
                   </div>
-
-                  <span className="text-sm md:text-base text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "日本語の説明文がありません"}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </section>
 
