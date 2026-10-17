@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import PokemonSearchForm from "../components/PokemonSearchForm";
 import { pokemonSearchMap } from "../lib/pokemonSearchMap";
 
@@ -19,10 +19,10 @@ const PokemonLayout = () => {
         bg-olive-350 dark:bg-(--code-bg)
       "
       >
-        <button type="button" onClick={() => navigate(`/`)} className="justify-self-start ml-2 font-bold  md:text-xl cursor-pointer">
+        <Link to="/" className="self-center justify-self-start ml-2 font-bold  md:text-xl cursor-pointer">
           <span className="text-slate-600 dark:text-amber-50">Peek</span>
           <span className="text-pink-400 dark:text-amber-500">Dex</span>
-        </button>
+        </Link>
         <div className="justify-self-end">
           <PokemonSearchForm onSearch={handleSearch} />
         </div>
