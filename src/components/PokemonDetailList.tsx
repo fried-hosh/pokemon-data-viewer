@@ -182,7 +182,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                   // 0なら元のタブ、-1or1なら一個先、-2or2なら二個先
                   let moveCount = Math.round(info.offset.x / tabWidth);
                   // タブの移動距離には満たないが速度が十分な場合に遷移
-                  if (moveCount === 0 && Math.abs(info.velocity.x) >= 10) moveCount = Math.sign(info.velocity.x);
+                  if (moveCount === 0 && Math.abs(info.velocity.x) >= 100) moveCount = Math.sign(info.velocity.x);
                   let nextIndex = index + moveCount;
                   // 範囲外にカーソルをドラッグした場合、最寄りの端にあるタブを選択
                   if (nextIndex > detailTabs.length - 1) nextIndex = detailTabs.length - 1;
