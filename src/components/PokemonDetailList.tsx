@@ -42,7 +42,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
   // タブの移動範囲
   const tabBarRef = useRef<HTMLDivElement>(null);
   // ドラッグが起きたかどうか
-  // ドラッグした直後のクリックを無視するためのref
+  // ドラッグが終わった直後に発火しうるclickイベントを無視するためのref
   const isDraggedRef = useRef(false);
 
   // 合計種族値
@@ -162,7 +162,10 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
             // 押下時にドラッグ中のフラグをリセット
             onPointerDown={() => (isDraggedRef.current = false)}
             onClick={() => {
-              if (isDraggedRef.current) return;
+              if (isDraggedRef.current) {
+                isDraggedRef.current = false;
+                return;
+              }
               setActiveTab(id);
             }}
             className="relative px-3 py-1"
