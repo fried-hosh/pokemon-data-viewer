@@ -41,6 +41,9 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
   const tabBackgroundRef = useRef<HTMLSpanElement>(null);
   // タブの移動範囲
   const tabBarRef = useRef<HTMLDivElement>(null);
+  // ドラッグが起きたかどうか
+  // ドラッグした直後のクリックを無視するためのref
+  const isDraggedRef = useRef(false);
 
   // 合計種族値
   const totalStats = details.stats
@@ -153,11 +156,22 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
             "
       >
         {detailTabs.map(({ id, label }, index) => (
-          <button key={id} type="button" onClick={() => setActiveTab(id)} className="relative px-3 py-1">
+          <button
+            key={id}
+            type="button"
+            // 押下時にドラッグ中のフラグをリセット
+            onPointerDown={() => (isDraggedRef.current = false)}
+            onClick={() => {
+              if (isDraggedRef.current) return;
+              setActiveTab(id);
+            }}
+            className="relative px-3 py-1"
+          >
             {activeTab === id && (
               <motion.span
                 ref={tabBackgroundRef}
                 drag="x"
+                onDragStart={() => (isDraggedRef.current = true)}
                 dragConstraints={tabBarRef}
                 // 0ではバネの戻りの強さの内部設定が原因で挙動が崩れるため極力小さい値に設定
                 dragElastic={0.0001}
@@ -166,7 +180,9 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                   if (!tabBackgroundRef.current) return;
                   const tabWidth = tabBackgroundRef.current?.offsetWidth;
                   // 0なら元のタブ、-1or1なら一個先、-2or2なら二個先
-                  const moveCount = Math.round(info.offset.x / tabWidth);
+                  let moveCount = Math.round(info.offset.x / tabWidth);
+                  // タブの移動距離には満たないが速度が十分な場合に遷移
+                  if (moveCount === 0 && Math.abs(info.velocity.x) >= 10) moveCount = Math.sign(info.velocity.x);
                   let nextIndex = index + moveCount;
                   // 範囲外にカーソルをドラッグした場合、最寄りの端にあるタブを選択
                   if (nextIndex > detailTabs.length - 1) nextIndex = detailTabs.length - 1;
