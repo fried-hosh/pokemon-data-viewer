@@ -38,6 +38,10 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
     setActiveTab("stats");
   }
 
+  const tabBackgroundRef = useRef<HTMLSpanElement>(null);
+  // タブの移動範囲
+  const tabBarRef = useRef<HTMLDivElement>(null);
+
   // 合計種族値
   const totalStats = details.stats
     .map((stat) => stat.baseStat)
@@ -140,16 +144,38 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
 
       {/* タブ切り替えボタン */}
       <div
+        ref={tabBarRef}
         className="md:hidden grid grid-cols-3 p-2 shadow-inner
             w-full max-w-md justify-self-center
             border rounded-full border-olive-300 dark:border-white/10
             bg-black/5 dark:bg-black/30
+            select-none
             "
       >
-        {detailTabs.map(({ id, label }) => (
+        {detailTabs.map(({ id, label }, index) => (
           <button key={id} type="button" onClick={() => setActiveTab(id)} className="relative px-3 py-1">
             {activeTab === id && (
               <motion.span
+                ref={tabBackgroundRef}
+                drag="x"
+                dragConstraints={tabBarRef}
+                // 0ではバネの戻りの強さの内部設定が原因で挙動が崩れるため極力小さい値に設定
+                dragElastic={0.0001}
+                dragSnapToOrigin
+                onDragEnd={(_event, info) => {
+                  if (!tabBackgroundRef.current) return;
+                  const tabWidth = tabBackgroundRef.current?.offsetWidth;
+                  // 0なら元のタブ、-1or1なら一個先、-2or2なら二個先
+                  const moveCount = Math.round(info.offset.x / tabWidth);
+                  let nextIndex = index + moveCount;
+                  // 範囲外にカーソルをドラッグした場合、最寄りの端にあるタブを選択
+                  if (nextIndex > detailTabs.length - 1) nextIndex = detailTabs.length - 1;
+                  if (nextIndex < 0) nextIndex = 0;
+                  const nextTab = detailTabs[nextIndex];
+                  if (!nextTab) return;
+
+                  setActiveTab(nextTab?.id);
+                }}
                 layoutId="detail-tab-button"
                 className="absolute inset-0 rounded-2xl
                 bg-linear-to-b from-olive-300 to-olive-100
@@ -158,7 +184,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
               />
             )}
             <span
-              className={`relative z-10 sm:text-lg font-bold
+              className={`relative z-10 pointer-events-none sm:text-lg font-bold
                   ${activeTab === id ? "text-pink-400 dark:text-amber-400" : "dark:text-white"}
                   `}
             >
