@@ -1,9 +1,9 @@
 import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
-import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
+import { HOVER_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
 import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
-import { Link } from "react-router-dom";
+import EvolutionLink from "./EvolutionLink";
 
 type EvolutionBranchProps = {
   startPokemonName: string;
@@ -143,19 +143,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
 
       {/* 名前・スプライト */}
       {!useManyBranchGrid && (
-        <Link
-          to={`/pokemon/${startPokemonName}`}
-          onClick={(event) => {
-            // cmd + クリック 等による操作は許可
-            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-            // 通常クリックによるLink自身の遷移を止め、onSelectのタイミングで移動する
-            event.preventDefault();
-
-            if (isPending) return;
-            onSelect(startPokemonName);
-          }}
-          className={`py-2 px-1 text-center ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : "ring-inset hover:ring-2 hover:ring-olive-500/50 hover:dark:ring-slate-400/50 rounded-xl"}`}
-        >
+        <EvolutionLink pokemonName={startPokemonName} isPending={isPending} onSelect={onSelect} className={`py-2 px-1 text-center ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : HOVER_POKEMON_FRAME_CLASS_NAME}`}>
           {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
           {/* 名前にカッコが含まれていれば折り返して表示 */}
           <span className="text-sm xl:text-base whitespace-nowrap">
@@ -168,7 +156,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
               jaName
             )}
           </span>
-        </Link>
+        </EvolutionLink>
       )}
 
       {branchPaths.length > 0 && (
@@ -181,13 +169,13 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
             <div className="flex-1 p-2">
               {/* 見出し */}
               <div className="grid grid-cols-4 gap-2 items-center mb-3">
-                <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`flex flex-col items-center p-2 gap-1 mr-2 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+                <EvolutionLink pokemonName={startPokemonName} isPending={isPending} onSelect={onSelect} className={`flex flex-col items-center p-2 gap-1 mr-2 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : HOVER_POKEMON_FRAME_CLASS_NAME}`}>
                   {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
-                </button>
+                </EvolutionLink>
                 <div className="flex flex-col">
-                  <button type="button" onClick={() => onSelect(startPokemonName)} tabIndex={-1} disabled={isPending} className="self-start">
+                  <EvolutionLink pokemonName={startPokemonName} isPending={isPending} onSelect={onSelect} tabIndex={-1} className="self-start">
                     <span className={`text-xl ${isSelected ? `${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>{jaName}</span>
-                  </button>
+                  </EvolutionLink>
                   <span>進化数: {branchPaths.length}</span>
                 </div>
               </div>
@@ -197,11 +185,11 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
                   const sprite = getSprite(path.to.name);
                   const isBranchSelected = selectedPokemonName === path.to.name;
                   return (
-                    <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 mb-1 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
-                      <button type="button" onClick={() => onSelect(path.to.name)} disabled={isPending}>
+                    <li key={path.to.name} className={`flex flex-col items-center p-2 gap-1 mb-1 ${isBranchSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : HOVER_POKEMON_FRAME_CLASS_NAME}`}>
+                      <EvolutionLink pokemonName={path.to.name} isPending={isPending} onSelect={onSelect} className="">
                         {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={path.to.name} />}
                         <span>{pokemonJaNameMap[path.to.name] ?? path.to.name}</span>
-                      </button>
+                      </EvolutionLink>
                       {path.evoDetails.map((conditions, index) =>
                         formatEvolutionConditions(conditions).map((condition) => (
                           <span key={`${index}-${condition.key}`} className="text-base text-center">

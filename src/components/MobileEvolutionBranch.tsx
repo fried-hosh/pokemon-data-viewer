@@ -1,8 +1,9 @@
 import { Fragment } from "react/jsx-runtime";
 import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
-import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
+import { HOVER_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
 import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
+import EvolutionLink from "./EvolutionLink";
 
 type MobileEvolutionBranchProps = {
   startPokemonName: string;
@@ -37,16 +38,16 @@ const MobileEvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtw
     <li className={`flex flex-col items-start ${connectorState ?? ""}`}>
       <div>
         {/* 名前・スプライト */}
-        <button
-          type="button"
-          onClick={() => onSelect(startPokemonName)}
-          disabled={isPending}
-          className={`mt-1 mb-1 p-1 pointer-coarse:outline-none
-        ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}
+        <EvolutionLink
+          pokemonName={startPokemonName}
+          isPending={isPending}
+          onSelect={onSelect}
+          className={`inline-block mt-1 mb-1 p-1 pointer-coarse:outline-none
+        ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : HOVER_POKEMON_FRAME_CLASS_NAME}`}
         >
           <span>{pokemonJaNameMap[startPokemonName] ?? startPokemonName}</span>
           {sprite !== null && <img className="size-18" src={sprite} alt={startPokemonName} />}
-        </button>
+        </EvolutionLink>
         {/* 進化条件 */}
         {currentConditions !== null && (
           <div className={`flex flex-col ${isSelected ? `${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
