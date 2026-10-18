@@ -64,7 +64,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
           .slice(0, 10);
 
   return (
-    <form className="flex gap-2 p-3 mx-auto " onSubmit={handleSubmit}>
+    <form className="flex gap-0 p-3 mx-auto " onSubmit={handleSubmit}>
       <div
         className="relative flex-1"
         onBlur={(event) => {
@@ -77,11 +77,13 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
         {/* 入力欄 */}
         <input
           ref={inputRef}
-          className=" w-full rounded-xl bg-white dark:bg-slate-800 px-4 py-3 text-olive-700 dark:text-white font-semibold shadow-sm
-            border border-olive-300 dark:border-amber-400
-            focus:outline-none focus:ring-2
+          placeholder="検索"
+          className=" w-full rounded-l-xl bg-white dark:bg-slate-800 px-4 py-3 text-olive-700 dark:text-white font-semibold shadow-sm
+            border border-olive-200 dark:border-amber-400
+            border-r-2 border-r-olive-400
+            focus:outline-none focus:ring-1 ring-inset
             focus:border-olive-400 focus:ring-olive-400
-            dark:focus:border-amber-400 dark:focus:ring-amber-400
+            dark:focus:border-amber-500 dark:focus:ring-amber-500
             transition
             "
           type="text"
@@ -147,19 +149,23 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
 
       {/* 検索ボタン */}
       <button
-        className="font-bold px-5 py-3 rounded-xl border shadow-sm
+        className="font-bold px-4 py-3 rounded-r-xl border shadow-sm
           text-lg leading-none
-          text-white dark:text-white
-          border-olive-200 bg-linear-to-b from-pink-400 to-pink-300 to-100%
-          dark:border-amber-500/70
+          text-pink-400 dark:text-white
+          border-l-0
+          border-olive-200 bg-white
           dark:bg-none dark:bg-amber-500
-          hover:scale-95 hover:shadow-md
+          hover:bg-olive-200
+          hover:dark:bg-amber-600
           active:translate-y-0.5 transition duration-200
           cursor-pointer
           "
         type="submit"
       >
-        検索
+        <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="16.5" y1="16.5" x2="21" y2="21" />
+        </svg>
       </button>
     </form>
   );
