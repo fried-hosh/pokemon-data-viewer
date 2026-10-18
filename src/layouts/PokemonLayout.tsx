@@ -21,7 +21,7 @@ const PokemonLayout = () => {
       >
         <Link to="/" className="self-center justify-self-start ml-2 font-bold  md:text-xl cursor-pointer">
           <span className="text-slate-600 dark:text-amber-50">Peek</span>
-          <span className="text-pink-400 dark:text-amber-500">Dex</span>
+          <span className="text-(--accent)">Dex</span>
         </Link>
         <div className="justify-self-end">
           <PokemonSearchForm onSearch={handleSearch} />

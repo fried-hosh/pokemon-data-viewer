@@ -204,7 +204,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
             )}
             <span
               className={`relative z-10 pointer-events-none sm:text-lg font-bold
-                  ${activeTab === id ? "text-pink-400 dark:text-amber-400" : "dark:text-white"}
+                  ${activeTab === id ? "text-(--accent)" : "dark:text-white"}
                   `}
             >
               {label}
@@ -234,7 +234,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                   <span className="w-12 mr-4 shrink-0 md:text-lg text-olive-600 dark:text-white text-right font-semibold tabular-nums">{stat.baseStat}</span>
                   {/* ゲージ */}
                   <div className="h-2 flex-1 rounded-full bg-olive-350 dark:bg-slate-200">
-                    <div className="h-full rounded-full bg-pink-400 dark:bg-orange-400" style={{ width: `${percentage}%` }} />
+                    <div className="h-full rounded-full bg-(--accent)" style={{ width: `${percentage}%` }} />
                   </div>
                 </li>
               );
