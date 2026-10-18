@@ -3,6 +3,7 @@ import type { EvolutionArtwork, EvolutionPath } from "../api/getPokemonDetails";
 import { SELECTED_POKEMON_BAR_CLASS_NAME, SELECTED_POKEMON_FRAME_CLASS_NAME, SELECTED_POKEMON_TEXT_CLASS_NAME } from "../lib/evolutionClassNames";
 import { formatEvolutionConditions } from "../lib/formatEvolutionConditions";
 import { pokemonJaNameMap } from "../lib/pokemonSearchMap";
+import { Link } from "react-router-dom";
 
 type EvolutionBranchProps = {
   startPokemonName: string;
@@ -142,7 +143,19 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
 
       {/* 名前・スプライト */}
       {!useManyBranchGrid && (
-        <button type="button" onClick={() => onSelect(startPokemonName)} disabled={isPending} className={`py-2 px-1 ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : ""}`}>
+        <Link
+          to={`/pokemon/${startPokemonName}`}
+          onClick={(event) => {
+            // cmd + クリック 等による操作は許可
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            // 通常クリックによるLink自身の遷移を止め、onSelectのタイミングで移動する
+            event.preventDefault();
+
+            if (isPending) return;
+            onSelect(startPokemonName);
+          }}
+          className={`py-2 px-1 text-center ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : "ring-inset hover:ring-2 hover:ring-olive-500/50 hover:dark:ring-slate-400/50 rounded-xl"}`}
+        >
           {sprite !== null && <img className="size-20 xl:size-24 object-contain" src={sprite} alt={startPokemonName} />}
           {/* 名前にカッコが含まれていれば折り返して表示 */}
           <span className="text-sm xl:text-base whitespace-nowrap">
@@ -155,7 +168,7 @@ const EvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtworks, 
               jaName
             )}
           </span>
-        </button>
+        </Link>
       )}
 
       {branchPaths.length > 0 && (
