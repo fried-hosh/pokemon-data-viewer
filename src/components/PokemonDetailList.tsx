@@ -71,6 +71,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
 
   const hasEvolution = details.evolutionPaths.length !== 0;
 
+  const jaName = pokemonJaNameMap[details.name] ?? details.name;
+
   return (
     <div
       className="grid grid-cols-1 gap-4 p-4
@@ -80,9 +82,9 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       {/* 進化表のみをスクロールアンカーの候補にすることで、特性欄の行数変化によるカーソルのずれをなくす */}
       <section className={`[overflow-anchor:none] ${panelClassName} animate-detail-panel-fade-in`}>
         <div className="grid grid-cols-2 md:grid-cols-[2fr_3fr] lg:grid-cols-2 gap-4">
-          {details.imageUrl !== null && <img className="mx-auto size-30 md:size-48 object-contain" src={details.imageUrl} alt={details.name} />}
+          {details.imageUrl !== null && <img className="mx-auto size-30 md:size-48 object-contain" src={details.imageUrl} alt={jaName} />}
           <div className="flex flex-col gap-2">
-            <h2>{pokemonJaNameMap[details.name] ?? details.name}</h2>
+            <h2>{jaName}</h2>
             <ul className="flex gap-1 font-bold lg:flex-col lg:items-start">
               {details.types.map((type) => {
                 const typeInfo = pokemonTypeMap[type];

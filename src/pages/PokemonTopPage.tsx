@@ -87,6 +87,7 @@ const PokemonTopPage = () => {
         "
         >
           <span
+            aria-hidden="true"
             className={`
         text-pink-400 dark:text-amber-200 font-bold mr-1
         inline-block group-hover:rotate-360 transition-transform duration-300 ${!isAllCardOpened ? "animate-spin" : ""}
