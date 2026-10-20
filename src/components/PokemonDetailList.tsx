@@ -71,6 +71,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
 
   const hasEvolution = details.evolutionPaths.length !== 0;
 
+  const jaName = pokemonJaNameMap[details.name] ?? details.name;
+
   return (
     <div
       className="grid grid-cols-1 gap-4 p-4
@@ -80,9 +82,9 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       {/* 進化表のみをスクロールアンカーの候補にすることで、特性欄の行数変化によるカーソルのずれをなくす */}
       <section className={`[overflow-anchor:none] ${panelClassName} animate-detail-panel-fade-in`}>
         <div className="grid grid-cols-2 md:grid-cols-[2fr_3fr] lg:grid-cols-2 gap-4">
-          {details.imageUrl !== null && <img className="mx-auto size-30 md:size-48 object-contain" src={details.imageUrl} alt={details.name} />}
+          {details.imageUrl !== null && <img className="mx-auto size-30 md:size-48 object-contain" src={details.imageUrl} alt={jaName} />}
           <div className="flex flex-col gap-2">
-            <h2>{pokemonJaNameMap[details.name] ?? details.name}</h2>
+            <h2>{jaName}</h2>
             <ul className="flex gap-1 font-bold lg:flex-col lg:items-start">
               {details.types.map((type) => {
                 const typeInfo = pokemonTypeMap[type];
@@ -104,18 +106,31 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                 className="
               inline-flex items-center gap-2
               lg:hidden self-start rounded-xl border border-(--border)
-              px-3 py-2 shadow-sm text-white dark:text-white font-semibold
-              bg-olive-400 hover:bg-olive-500
+              px-3 py-2 shadow-sm text-olive-700 dark:text-white font-semibold
+              bg-olive-300 hover:bg-olive-400
               dark:bg-slate-800 dark:hover:bg-white/15
               transition active:scale-95
               "
                 onClick={() => evolutionDialogRef.current?.showModal()}
               >
-                進化表を見る
-                <span aria-hidden="true">›</span>
+                <span aria-hidden="true">
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="5" cy="12" r="2.5" />
+                    <circle cx="19" cy="5" r="2.5" />
+                    <circle cx="19" cy="19" r="2.5" />
+                    <path d="M7.5 12h4M11.5 12V5h5M11.5 12v7h5" />
+                  </svg>
+                </span>
+                進化表
               </button>
             ) : (
-              <p className="lg:hidden self-start rounded-xl px-3 py-2 font-semibold border border-slate-300 border-dashed text-slate-400 bg-olive-200 dark:bg-slate-600 cursor-default select-none">進化 : なし</p>
+              <p
+                className="lg:hidden self-start rounded-xl px-3 py-2 font-semibold border border-slate-300 border-dashed
+                text-olive-400 dark:text-slate-400
+                bg-olive-200 dark:bg-slate-600 cursor-default select-none"
+              >
+                進化 : なし
+              </p>
             )}
           </div>
         </div>
@@ -126,17 +141,17 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
           {details.abilities.length === 0 ? (
             <p className="text-olive-500 dark:text-slate-300">データが追加されていません</p>
           ) : (
-            <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+            <ul className="divide-y divide-olive-200 dark:divide-slate-700">
               {details.abilities.map((ability) => (
                 <li key={ability.name} className="flex flex-col gap-1">
                   <div className="flex flex-col gap-1 py-2 md:py-3">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base md:text-lg text-slate-700 dark:text-slate-200">{ability.name}</span>
+                      <span className="font-bold text-base md:text-lg text-olive-700 dark:text-slate-200">{ability.name}</span>
 
                       {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
                     </div>
 
-                    <span className="text-sm md:text-base text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "未登録"}</span>
+                    <span className="text-sm md:text-base text-olive-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "未登録"}</span>
                   </div>
                 </li>
               ))}
@@ -204,7 +219,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
             )}
             <span
               className={`relative z-10 pointer-events-none sm:text-lg font-bold
-                  ${activeTab === id ? "text-pink-400 dark:text-amber-400" : "dark:text-white"}
+                  ${activeTab === id ? "text-(--accent)" : "dark:text-white"}
                   `}
             >
               {label}
@@ -234,7 +249,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                   <span className="w-12 mr-4 shrink-0 md:text-lg text-olive-600 dark:text-white text-right font-semibold tabular-nums">{stat.baseStat}</span>
                   {/* ゲージ */}
                   <div className="h-2 flex-1 rounded-full bg-olive-350 dark:bg-slate-200">
-                    <div className="h-full rounded-full bg-pink-400 dark:bg-orange-400" style={{ width: `${percentage}%` }} />
+                    <div className="h-full rounded-full bg-(--accent)" style={{ width: `${percentage}%` }} />
                   </div>
                 </li>
               );
