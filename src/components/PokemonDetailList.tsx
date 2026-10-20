@@ -115,7 +115,13 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                 <span aria-hidden="true">›</span>
               </button>
             ) : (
-              <p className="lg:hidden self-start rounded-xl px-3 py-2 font-semibold border border-slate-300 border-dashed text-slate-400 bg-olive-200 dark:bg-slate-600 cursor-default select-none">進化 : なし</p>
+              <p
+                className="lg:hidden self-start rounded-xl px-3 py-2 font-semibold border border-slate-300 border-dashed
+                text-olive-400 dark:text-slate-400
+                bg-olive-200 dark:bg-slate-600 cursor-default select-none"
+              >
+                進化 : なし
+              </p>
             )}
           </div>
         </div>
@@ -126,17 +132,17 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
           {details.abilities.length === 0 ? (
             <p className="text-olive-500 dark:text-slate-300">データが追加されていません</p>
           ) : (
-            <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+            <ul className="divide-y divide-olive-200 dark:divide-slate-700">
               {details.abilities.map((ability) => (
                 <li key={ability.name} className="flex flex-col gap-1">
                   <div className="flex flex-col gap-1 py-2 md:py-3">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base md:text-lg text-slate-700 dark:text-slate-200">{ability.name}</span>
+                      <span className="font-bold text-base md:text-lg text-olive-700 dark:text-slate-200">{ability.name}</span>
 
                       {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
                     </div>
 
-                    <span className="text-sm md:text-base text-slate-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "未登録"}</span>
+                    <span className="text-sm md:text-base text-olive-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "未登録"}</span>
                   </div>
                 </li>
               ))}

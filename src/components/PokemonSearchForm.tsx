@@ -100,7 +100,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
             className="
               absolute z-50 top-full left-0 min-w-auto flex flex-col gap-0.5 mt-1 p-1.5 shadow-md
               border rounded-xl border-olive-300 dark:border-slate-400
-              bg-taupe-100/80 dark:bg-slate-900/80
+              bg-olive-100/80 dark:bg-slate-900/80
               "
             onMouseDown={(event) => event.preventDefault()}
           >
@@ -110,10 +110,10 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
                 <li key={name} className="animate-suggest-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
                   <button
                     className="
-                      w-full p-0.5 px-2 font-bold text-lg border rounded border-slate-700/15 dark:border-slate-200/20
-                      hover:ring hover:ring-amber-50
+                      w-full p-0.5 px-2 font-bold text-lg border rounded border-olive-700/15 dark:border-slate-200/20
+                      hover:ring hover:ring-pink-400 dark:hover:ring-amber-50
                       bg-olive-50 dark:bg-slate-900
-                      hover:bg-taupe-300 hover:text-black dark:hover:bg-amber-500 dark:hover:text-white
+                      hover:bg-olive-200 hover:text-black dark:hover:bg-amber-500 dark:hover:text-white
                       transition-colors
                       "
                     type="button"

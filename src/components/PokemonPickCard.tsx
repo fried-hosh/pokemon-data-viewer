@@ -118,7 +118,7 @@ const PokemonPickCard = ({ jaName, apiName, index, onFinished, hasShadow }: Prop
       "
             >
               <p className="text-sm">全国図鑑No.{data.dexNumber}</p>
-              <p className="flex items-center justify-center font-bold text-slate-900 dark:text-slate-900 md:min-h-[2lh]">{jaName}</p>
+              <p className="flex items-center justify-center font-bold text-olive-900 dark:text-slate-900 md:min-h-[2lh]">{jaName}</p>
               <p>{data.genus}</p>
               <div className="flex justify-center gap-1">
                 {data.types.map((type) => (

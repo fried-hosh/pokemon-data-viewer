@@ -108,7 +108,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
   return (
     <section className={`${panelClassName}`}>
       {/* タイトル 対象作品名 */}
-      <div className="mb-3 flex justify-between items-center border-slate-400">
+      <div className="mb-3 flex justify-between items-center">
         <h2 className="hidden md:block">覚える技</h2>
         {displayVersionName !== undefined && <span className="font-bold ml-auto">{`${versionGroupMap[displayVersionName] ?? displayVersionName}`}</span>}
       </div>
@@ -118,7 +118,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
       <div
         className="
       max-h-[60vh] lg:max-h-none lg:flex-1 overflow-y-auto p-2 shadow-inner
-      rounded-lg border border-slate-300
+      rounded-lg border border-olive-300
       dark:border-slate-600 dark:bg-slate-900/20
       "
       >
@@ -126,13 +126,13 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
           <p className="text-center text-olive-500 dark:text-slate-300">データが追加されていません</p>
         ) : (
           sortedAccumulatedMovesArray.map(([learnMethod, moves]) => (
-            <div key={learnMethod} className="pb-3 mb-3 border-b last:border-b-0 border-slate-400">
+            <div key={learnMethod} className="pb-3 mb-3 border-b last:border-b-0 border-olive-400 dark:border-slate-400">
               {/* 習得カテゴリ */}
               <h3
                 className="
               sticky top-0 z-10 py-2
               bg-slate-50/50 dark:bg-slate-900/50
-              mb-3 border-l-3 border-(--accent) pl-3 font-semibold text-lg text-slate-800 dark:text-slate-300
+              mb-3 border-l-3 border-(--accent) pl-3 font-semibold text-lg text-olive-800 dark:text-slate-300
 
               "
               >
@@ -143,7 +143,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
                   key={`${move.id}-${move.level ?? "no-level"}`}
                   className="
                 p-2 mb-2 shadow-sm border
-                border-slate-400/70 bg-amber-100/40
+                border-olive-400/70 bg-amber-100/40
                 dark:border-amber-50/80 dark:bg-amber-100/4 rounded
                 "
                 >
@@ -153,7 +153,7 @@ const PokemonMovesPanel = ({ pokemonMoves, panelClassName }: PokemonMovesPanelPr
                     <div className="flex gap-3 items-center">
                       {learnMethod === "level-up" && <span className="w-12">Lv. {move.level} </span>}
                       <div className="flex flex-1 items-center justify-between ">
-                        <span className="text-slate-700 dark:text-white">{move.jaName}</span>
+                        <span className="text-olive-700 dark:text-white">{move.jaName}</span>
                         <span className={`rounded-xl px-2 py-1 text-white text-sm ${pokemonTypeMap[move.type].bgColorClass}`}>{pokemonTypeMap[move.type].ja}</span>
                       </div>
                     </div>

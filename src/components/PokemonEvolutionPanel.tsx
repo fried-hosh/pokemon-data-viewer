@@ -111,7 +111,7 @@ const PokemonEvolutionPanel = ({ details, panelClassName, mobileDialogRef }: Evo
             <MobileEvolutionBranch startPokemonName={rootPokemonName} evolutionPaths={details.evolutionPaths} evolutionArtworks={details.evolutionArtworks} onSelect={handleEvolutionSelect} isPending={selectionStatus === "pending"} selectedPokemonName={details.name} selectedPaths={selectedPaths} />
           </ul>
           {/* 閉じるエリア */}
-          <div className="w-full mt-3 border-t border-slate-400 dark:border-slate-400 ">
+          <div className="w-full mt-3 border-t border-olive-400 dark:border-slate-400 ">
             <button type="button" className="pt-2 pb-2 w-full text-center " onClick={() => mobileDialogRef.current?.close()}>
               閉じる
             </button>

@@ -80,7 +80,7 @@ const PokemonTopPage = () => {
           type="button"
           onClick={() => handleReroll()}
           className="group
-        font-semibold text-slate-700 dark:text-slate-200 p-2 mt-2 self-center
+        font-semibold text-olive-700 dark:text-slate-200 p-2 mt-2 self-center
         border-3 rounded-full border-amber-100/30 dark:border-(--border)/30 shadow-md
         transition enabled:hover:-translate-y-0.5 enabled:hover:shadow-xl active:translate-y-0 active:scale-95
         disabled:opacity-60
