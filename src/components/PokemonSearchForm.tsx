@@ -116,7 +116,9 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
                       hover:bg-olive-200 hover:text-black dark:hover:bg-amber-500 dark:hover:text-white
                       transition-colors
                       "
-                    onClick={() => {
+                    onClick={(event) => {
+                      // cmd + クリック 等による操作で元ページに候補を残す
+                      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
                       // 変換中のキーボードを閉じる (閉じないと、iOSの標準キーボードで検索欄への入力が続けてできなくなるバグが発生する)
                       inputRef.current?.blur();
                       setInputName("");
