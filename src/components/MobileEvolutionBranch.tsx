@@ -34,6 +34,8 @@ const MobileEvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtw
     return selectedPaths.some((selectedPath) => selectedPath === path);
   });
 
+  const jaName = pokemonJaNameMap[startPokemonName] ?? startPokemonName;
+
   return (
     <li className={`flex flex-col items-start ${connectorState ?? ""}`}>
       <div>
@@ -45,8 +47,8 @@ const MobileEvolutionBranch = ({ startPokemonName, evolutionPaths, evolutionArtw
           className={`inline-block mt-1 mb-1 p-1 pointer-coarse:outline-none
         ${isSelected ? `${SELECTED_POKEMON_FRAME_CLASS_NAME} ${SELECTED_POKEMON_TEXT_CLASS_NAME}` : HOVER_POKEMON_FRAME_CLASS_NAME}`}
         >
-          <span>{pokemonJaNameMap[startPokemonName] ?? startPokemonName}</span>
-          {sprite !== null && <img className="size-18" src={sprite} alt={startPokemonName} />}
+          <span>{jaName}</span>
+          {sprite !== null && <img aria-hidden="true" className="size-18" src={sprite} alt={jaName} />}
         </EvolutionLink>
         {/* 進化条件 */}
         {currentConditions !== null && (
