@@ -104,15 +104,22 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                 className="
               inline-flex items-center gap-2
               lg:hidden self-start rounded-xl border border-(--border)
-              px-3 py-2 shadow-sm text-white dark:text-white font-semibold
-              bg-olive-400 hover:bg-olive-500
+              px-3 py-2 shadow-sm text-olive-700 dark:text-white font-semibold
+              bg-olive-300 hover:bg-olive-400
               dark:bg-slate-800 dark:hover:bg-white/15
               transition active:scale-95
               "
                 onClick={() => evolutionDialogRef.current?.showModal()}
               >
-                進化表を見る
-                <span aria-hidden="true">›</span>
+                <span aria-hidden="true">
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="5" cy="12" r="2.5" />
+                    <circle cx="19" cy="5" r="2.5" />
+                    <circle cx="19" cy="19" r="2.5" />
+                    <path d="M7.5 12h4M11.5 12V5h5M11.5 12v7h5" />
+                  </svg>
+                </span>
+                進化表
               </button>
             ) : (
               <p
