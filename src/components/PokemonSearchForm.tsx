@@ -149,6 +149,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
 
       {/* 検索ボタン */}
       <button
+        aria-label="検索"
         className="font-bold px-4 py-3 rounded-r-xl border shadow-sm
           text-lg leading-none
           text-pink-400 dark:text-white
