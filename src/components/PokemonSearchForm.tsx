@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { pokemonSearchMap } from "../lib/pokemonSearchMap";
 import { normalizeSearchText } from "../lib/normalizeSearchText";
-import { flushSync } from "react-dom";
+import { Link } from "react-router-dom";
 
 type Props = {
   onSearch: (name: string) => void;
@@ -12,9 +12,8 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
   // 検索候補
   const [isSuggestOpen, setIsSuggestOpen] = useState<boolean>(true);
 
-  // 変換確定前に候補を選択した場合のモバイルIME動作不具合解消
+  // 入力欄のフォーカスを操作する
   const inputRef = useRef<HTMLInputElement>(null);
-  const pointerTypeRef = useRef<string>("mouse");
 
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -108,36 +107,24 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
               candidateNames.map((name, index) => (
                 // フェードインアニメーション / 要素ごとに30msずつずらす
                 <li key={name} className="animate-suggest-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
-                  <button
+                  <Link
+                    to={`/pokemon/${pokemonSearchMap[name]}`}
                     className="
-                      w-full p-0.5 px-2 font-bold text-lg border rounded border-olive-700/15 dark:border-slate-200/20
+                      block text-center p-0.5 px-2 font-bold text-lg border rounded border-olive-700/15 dark:border-slate-200/20
                       hover:ring hover:ring-pink-400 dark:hover:ring-amber-50
                       bg-olive-50 dark:bg-slate-900
                       hover:bg-olive-200 hover:text-black dark:hover:bg-amber-500 dark:hover:text-white
                       transition-colors
                       "
-                    type="button"
-                    // 押下された瞬間のイベントを拾う
-                    onPointerDown={(event) => {
-                      pointerTypeRef.current = event.pointerType;
-                    }}
-                    // 押下を離した瞬間
                     onClick={() => {
+                      // 変換中のキーボードを閉じる (閉じないと、iOSの標準キーボードで検索欄への入力が続けてできなくなるバグが発生する)
                       inputRef.current?.blur();
-                      // windowsでの動作を確認できないためflushSyncを残す
-                      flushSync(() => {
-                        setInputName(name);
-                        setIsSuggestOpen(false);
-                      });
-                      // モバイルはblurのまま / PCはfocus
-                      if (pointerTypeRef.current === "mouse") {
-                        inputRef.current?.focus();
-                      }
+                      setInputName("");
                     }}
                     onMouseDown={(event) => event.preventDefault()}
                   >
                     {name}
-                  </button>
+                  </Link>
                 </li>
               ))
             ) : (
