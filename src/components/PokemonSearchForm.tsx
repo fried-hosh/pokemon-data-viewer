@@ -80,7 +80,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
           placeholder="検索"
           className=" w-full rounded-l-xl bg-white dark:bg-slate-800 px-4 py-3 text-olive-700 dark:text-white font-semibold shadow-sm
             border border-olive-200 dark:border-amber-400
-            border-r-2 border-r-olive-400
+            border-r-2 border-r-olive-400 dark:border-r-amber-400
             focus:outline-none focus:ring-1 ring-inset
             focus:border-olive-400 focus:ring-olive-400
             dark:focus:border-amber-500 dark:focus:ring-amber-500
@@ -153,7 +153,7 @@ const PokemonSearchForm = ({ onSearch }: Props) => {
           text-lg leading-none
           text-pink-400 dark:text-white
           border-l-0
-          border-olive-200 bg-white
+          border-olive-200 dark:border-amber-400 bg-white
           dark:bg-none dark:bg-amber-500
           hover:bg-olive-200
           hover:dark:bg-amber-600
