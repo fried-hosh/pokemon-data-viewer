@@ -18,6 +18,8 @@ type Props = {
 
 type DetailTab = "stats" | "typeEffectiveness" | "moves";
 
+type AbilityTab = "ability" | "flavor";
+
 const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Props) => {
   // モバイルでのタブ切り替え
   const [activeTab, setActiveTab] = useState<DetailTab>("stats");
@@ -26,7 +28,11 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
     { id: "typeEffectiveness", label: "タイプ相性" },
     { id: "moves", label: "覚える技" },
   ];
-  // 表示するポケモンが変わったら、モバイルのタブを種族値に戻す
+  // 特性・図鑑テキスト切り替え
+  const [abilityView, setAbilityView] = useState<AbilityTab>("ability");
+  const abilityViewClassName = "dark:text-white font-semibold underline underline-offset-6 decoration-3 decoration-(--accent)";
+
+  // 表示するポケモンが変わったら、モバイルのタブを種族値に、図鑑テキストを特性テキストに戻す
   // - キャッシュがあるとそのコンポーネントは作り直されず、前回選択していたタブの状態が残ってしまうため
   // - key={pokemonName} で作り直すと進化表での選択時にモーダルが閉じられてしまう
   // - イベントハンドラではブラウザの 戻る/進む に対応ができない
@@ -36,6 +42,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
   if (prevPokemonName !== details.name) {
     setPrevPokemonName(details.name);
     setActiveTab("stats");
+    setAbilityView("ability");
   }
 
   const tabBackgroundRef = useRef<HTMLSpanElement>(null);
@@ -78,7 +85,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
       className="grid grid-cols-1 gap-4 p-4
          md:grid-cols-2 lg:grid-cols-[1fr_0.8fr_1fr] "
     >
-      {/* 基本情報 - 名前、画像、タイプ、特性、進化表モーダル */}
+      {/* 基本情報 - 名前、画像、タイプ、特性、図鑑テキスト、進化表モーダル */}
       {/* 進化表のみをスクロールアンカーの候補にすることで、特性欄の行数変化によるカーソルのずれをなくす */}
       <section className={`[overflow-anchor:none] ${panelClassName} animate-detail-panel-fade-in`}>
         <div className="grid grid-cols-2 md:grid-cols-[2fr_3fr] lg:grid-cols-2 gap-4">
@@ -99,6 +106,7 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
                 );
               })}
             </ul>
+
             {/* 進化表モーダル */}
             {hasEvolution ? (
               <button
@@ -135,28 +143,51 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
           </div>
         </div>
 
-        {/* 特性 */}
-        <section className={`${panelClassName} mt-2`}>
-          <h2>特性</h2>
-          {details.abilities.length === 0 ? (
-            <p className="text-olive-500 dark:text-slate-300">データが追加されていません</p>
-          ) : (
-            <ul className="divide-y divide-olive-200 dark:divide-slate-700">
-              {details.abilities.map((ability) => (
-                <li key={ability.name} className="flex flex-col gap-1">
-                  <div className="flex flex-col gap-1 py-2 md:py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-base md:text-lg text-olive-700 dark:text-slate-200">{ability.name}</span>
+        {/* 特性 / 図鑑テキスト切り替え */}
+        {/* 特性と図鑑を同じマスに重ね、invisibleで切り替えることで、パネルの高さを固定する */}
+        <section className={`${panelClassName} flex flex-col gap-2 mt-2`}>
+          <div className={`flex gap-3 items-center`}>
+            {/* 特性ボタン */}
+            <button type="button" aria-pressed={abilityView === "ability"} onClick={() => setAbilityView("ability")} className={`${abilityView === "ability" ? abilityViewClassName : ""} cursor-pointer text-xl`}>
+              特性
+            </button>
+            {/* 区切り線 */}
+            <span aria-hidden="true" className="text-olive-450 dark:text-slate-400 select-none">
+              |
+            </span>
+            {/* 図鑑ボタン */}
+            <button type="button" aria-pressed={abilityView === "flavor"} onClick={() => setAbilityView("flavor")} className={`${abilityView === "flavor" ? abilityViewClassName : ""} cursor-pointer text-xl`}>
+              図鑑
+            </button>
+          </div>
+          <div className="grid">
+            {/* 特性テキスト */}
+            <div className={`col-start-1 row-start-1 ${abilityView === "flavor" ? "invisible" : ""}`}>
+              {details.abilities.length === 0 ? (
+                <p className="text-olive-500 dark:text-slate-300">特性データが追加されていません</p>
+              ) : (
+                <ul className="divide-y divide-olive-200 dark:divide-slate-700">
+                  {details.abilities.map((ability) => (
+                    <li key={ability.name} className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 py-2 md:py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-base md:text-lg text-olive-700 dark:text-slate-200">{ability.name}</span>
 
-                      {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
-                    </div>
+                          {ability.isHidden && <span className="rounded-full bg-pink-50 px-2 py-0.5 text-pink-600 text-xs">隠れ特性</span>}
+                        </div>
 
-                    <span className="text-sm md:text-base text-olive-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "未登録"}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                        <span className="text-sm md:text-base text-olive-600 leading-relaxed dark:text-slate-300">{ability.description?.replaceAll("　", "").replaceAll("\n", "") ?? "未登録"}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {/* 図鑑テキスト */}
+            <div className={`col-start-1 row-start-1 ${abilityView === "ability" ? "invisible" : ""}`}>
+              {details.flavorText === null ? <p className="text-olive-500 dark:text-slate-300">図鑑データが追加されていません</p> : <span className="text-lg text-olive-600 leading-relaxed dark:text-slate-300 break-keep">{details.flavorText.replaceAll("\n", "　")}</span>}
+            </div>
+          </div>
         </section>
       </section>
 

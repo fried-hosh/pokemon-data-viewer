@@ -89,6 +89,13 @@ const SpeciesSchema = z.object({
       }),
     }),
   ),
+  flavor_text_entries: z.array(
+    z.object({
+      flavor_text: z.string(),
+      language: z.object({ name: z.string() }),
+      version: z.object({ name: z.string() }),
+    }),
+  ),
 });
 
 // 進化条件
@@ -191,6 +198,7 @@ export type PokemonDetails = {
   evolutionArtworks: EvolutionArtwork[];
   typeEffectiveness: TypeEffectivenessGroup[] | null;
   pokemonMoves: PokemonMoveData;
+  flavorText: string | null;
 };
 
 type NamedApiResourceWithJa = {
@@ -606,6 +614,9 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     };
   });
 
+  // フレーバーテキスト / 最新のものだけ取り出す
+  const flavorText = speciesData.flavor_text_entries.filter((entry) => entry.language.name === "ja").at(-1)?.flavor_text ?? speciesData.flavor_text_entries.filter((entry) => entry.language.name === "en").at(-1)?.flavor_text ?? null;
+
   return {
     id: pokemonData.id,
     name: pokemonData.name,
@@ -617,5 +628,6 @@ export const getPokemonDetails = async (pokemonName: string): Promise<PokemonDet
     evolutionArtworks: evolutionArtworks,
     typeEffectiveness,
     pokemonMoves: pokemonData.moves,
+    flavorText,
   };
 };

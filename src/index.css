@@ -82,6 +82,7 @@
 }
 @theme {
   --color-olive-350: oklch(80.85% 0.016 106.75);
+  --color-olive-450: oklch(65.85% 0.026 107.1);
 }
 
 @layer base {
