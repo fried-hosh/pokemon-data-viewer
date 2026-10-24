@@ -146,11 +146,17 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
         {/* 特性 / 図鑑テキスト切り替え */}
         {/* 特性と図鑑を同じマスに重ね、invisibleで切り替えることで、パネルの高さを固定する */}
         <section className={`${panelClassName} flex flex-col gap-2 mt-2`}>
-          <div className={`flex gap-5`}>
-            <button type="button" onClick={() => setAbilityView("ability")} className={`${abilityView === "ability" ? abilityViewClassName : ""} cursor-pointer text-xl`}>
+          <div className={`flex gap-3 items-center`}>
+            {/* 特性ボタン */}
+            <button type="button" aria-pressed={abilityView === "ability"} onClick={() => setAbilityView("ability")} className={`${abilityView === "ability" ? abilityViewClassName : ""} cursor-pointer text-xl`}>
               特性
             </button>
-            <button type="button" onClick={() => setAbilityView("flavor")} className={`${abilityView === "flavor" ? abilityViewClassName : ""} cursor-pointer text-xl`}>
+            {/* 区切り線 */}
+            <span aria-hidden="true" className="text-olive-450 dark:text-slate-400 select-none">
+              |
+            </span>
+            {/* 図鑑ボタン */}
+            <button type="button" aria-pressed={abilityView === "flavor"} onClick={() => setAbilityView("flavor")} className={`${abilityView === "flavor" ? abilityViewClassName : ""} cursor-pointer text-xl`}>
               図鑑
             </button>
           </div>
