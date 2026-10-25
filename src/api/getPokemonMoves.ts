@@ -31,6 +31,7 @@ const VersionGroupSchema = z.object({
 
 const VersionGroupArraySchema = z.array(VersionGroupSchema);
 
+// 技1件分
 const moveSchema = z.object({
   id: z.number(),
   accuracy: z.number().nullable(),
@@ -45,6 +46,14 @@ const moveSchema = z.object({
   names: z.array(
     z.object({
       name: z.string(),
+      language: z.object({
+        name: z.string(),
+      }),
+    }),
+  ),
+  flavor_text_entries: z.array(
+    z.object({
+      flavor_text: z.string(),
       language: z.object({
         name: z.string(),
       }),
@@ -72,6 +81,7 @@ export type PokemonMoveItem = {
   name: string;
   level: number | null;
   learnMethod: string;
+  flavorText: string | null;
 };
 
 export type PokemonMoveData = z.infer<typeof PokemonMoveSchema>[];
@@ -141,7 +151,7 @@ export const getPokemonMoves = async (pokemonMoves: PokemonMoveData): Promise<Po
       version_group_details: pokemonMove.version_group_details.filter((detail) => detail.version_group.name === targetVersionGroupName),
     }));
 
-  // move.url から 日本語名, pp, 物理特殊区分 を取得
+  // move.url から技の詳細を取得
   const latestMoveResponses = await Promise.all(latestPokemonMoves.map((pokemonMove) => fetch(pokemonMove.move.url)));
   for (const res of latestMoveResponses) {
     if (!res.ok) {
@@ -157,6 +167,7 @@ export const getPokemonMoves = async (pokemonMoves: PokemonMoveData): Promise<Po
   const latestMovesData = latestMovesResult.data;
 
   // 返り値
+  // 技の情報（latestMovesData）と習得条件（latestPokemonMoves）は同じ順番で並んでいるため、indexで対応させる
   const displayVersionName = targetVersionGroupName;
   const pokemonMoveItems: PokemonMoveItem[] = latestMovesData.flatMap((data, index) => {
     const pokemonMove = latestPokemonMoves[index];
@@ -172,7 +183,9 @@ export const getPokemonMoves = async (pokemonMoves: PokemonMoveData): Promise<Po
     const pp = data.pp;
     const damageClass = data.damage_class.name;
     const name = pokemonMove.move.name;
+    const flavorText = data.flavor_text_entries.filter((entry) => entry.language.name === "ja").at(-1)?.flavor_text ?? data.flavor_text_entries.filter((entry) => entry.language.name === "en").at(-1)?.flavor_text ?? null;
 
+    // 習得方法ごとにカード一枚分を作る (同じ技をレベルとわざマシンで覚えるなら二枚になる)
     return pokemonMove.version_group_details.map((detail) => {
       const learnMethod = detail.move_learn_method.name;
       const level = learnMethod === "level-up" ? detail.level_learned_at : null;
@@ -189,6 +202,7 @@ export const getPokemonMoves = async (pokemonMoves: PokemonMoveData): Promise<Po
         name,
         level,
         learnMethod,
+        flavorText,
       };
     });
   });
