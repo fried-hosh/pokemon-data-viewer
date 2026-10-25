@@ -1,7 +1,3 @@
-// 名前、画像、タイプ、種族値(個別・合計)、特性
-// 進化チェーン、進化レベル/手段（名前or画像クリックで該当ポケモンのDetailに遷移）
-// タイプ相性
-// 覚える技
 import { z } from "zod";
 import { type PokemonType } from "../lib/pokemonTypeMap";
 import { PokemonTypeSchema } from "../lib/pokemonTypeMap";
