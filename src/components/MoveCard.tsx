@@ -10,20 +10,21 @@ const damageClassMap: Record<PokemonMoveItem["damageClass"], string> = {
   special: "特殊",
   status: "変化",
 };
+const ACCENT_DATA_CLASSNAME = "text-olive-700 dark:text-white";
 
 // 技一件分
 const MoveCard = ({ move }: Props) => {
   const [toggleFlavorText, setToggleFlavorText] = useState(false);
+
   return (
     <div
       onClick={() => setToggleFlavorText(!toggleFlavorText)}
-      className="
+      className={`
     p-2 mb-2 shadow-sm border
     border-olive-400/70 bg-amber-100/40
     dark:border-amber-50/80 dark:bg-amber-100/4 rounded
-    hover:ring hover:ring-pink-400 hover:dark:ring-amber-500
-    select-none
-    "
+    select-none ${move.flavorText === null ? "cursor-default" : "cursor-pointer hover:ring hover:ring-pink-400 hover:dark:ring-amber-500"}
+    `}
     >
       {/* mdのみ配置変更 */}
       <div className="md:grid md:grid-cols-2 md:items-center md:gap-6 lg:block">
@@ -31,7 +32,7 @@ const MoveCard = ({ move }: Props) => {
         <div className="flex gap-3 items-center">
           {move.learnMethod === "level-up" && <span className="w-12">Lv. {move.level} </span>}
           <div className="flex flex-1 items-center justify-between ">
-            <span className="text-olive-700 dark:text-white">{move.jaName}</span>
+            <span className={ACCENT_DATA_CLASSNAME}>{move.jaName}</span>
             <span className={`rounded-xl px-2 py-1 text-white text-sm ${pokemonTypeMap[move.type].bgColorClass}`}>{pokemonTypeMap[move.type].ja}</span>
           </div>
         </div>
@@ -41,15 +42,15 @@ const MoveCard = ({ move }: Props) => {
           <div className="flex gap-4">
             <span className="flex justify-between w-16">
               <span>威力</span>
-              <span>{move.power || "―"}</span>
+              <span className={ACCENT_DATA_CLASSNAME}>{move.power || "―"}</span>
             </span>
             <span className="flex justify-between w-16">
               <span>命中</span>
-              <span>{move.accuracy || "―"}</span>
+              <span className={ACCENT_DATA_CLASSNAME}>{move.accuracy || "―"}</span>
             </span>
             <span className="flex justify-between w-10">
               <span>PP</span>
-              <span>{move.pp || "―"}</span>
+              <span className={ACCENT_DATA_CLASSNAME}>{move.pp || "―"}</span>
             </span>
           </div>
         </div>
@@ -69,9 +70,10 @@ const MoveCard = ({ move }: Props) => {
       )}
       {/* テキスト */}
       {/* gridの0fr〜1frで高さの変化を計算してアニメーションをつける */}
+      {/* 改行と全角スペースをゼロ幅スペースにして、空白を見せずにbreak-keepで折り返す */}
       {move.flavorText !== null && (
         <div className={`grid ${toggleFlavorText ? "grid-rows-[1fr]" : "grid-rows-[0fr]"} transition-[grid-template-rows] duration-200`}>
-          <span className="overflow-hidden">{move.flavorText}</span>
+          <span className={`overflow-hidden text-sm break-keep ${ACCENT_DATA_CLASSNAME}`}>{move.flavorText.replaceAll("\n", "\u200B").replaceAll("　", "\u200B")}</span>
         </div>
       )}
     </div>
