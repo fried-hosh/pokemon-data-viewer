@@ -300,7 +300,8 @@ const PokemonDetailList = ({ details, moves, isMovesLoading, isMovesError }: Pro
           </div>
         )}
         {isMovesError && <p className="text-red-200">技の取得に失敗しました</p>}
-        {moves && <PokemonMovesPanel pokemonMoves={moves} panelClassName={`${panelClassName} lg:absolute lg:inset-0 lg:flex lg:flex-col animate-detail-panel-fade-in md:[animation-delay:320ms]`} />}
+        {/* ポケモンが変わったらkeyで技パネルを作り直して、開いている説明文をすべて閉じる */}
+        {moves && <PokemonMovesPanel key={details.name} pokemonMoves={moves} panelClassName={`${panelClassName} lg:absolute lg:inset-0 lg:flex lg:flex-col animate-detail-panel-fade-in md:[animation-delay:320ms]`} />}
       </div>
 
       {/* 進化チェーン */}
