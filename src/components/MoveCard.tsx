@@ -60,11 +60,11 @@ const MoveCard = ({ move }: Props) => {
       {move.flavorText !== null && (
         <div className="flex items-center select-none">
           <div className="flex-1 border-t border-dashed" />
-          <span className={`transition-transform duration-200 ${toggleFlavorText ? "rotate-180" : ""}`}>
+          <button type="button" aria-label={`${move.jaName}の説明文`} aria-expanded={toggleFlavorText} className={`transition-transform duration-200 ${toggleFlavorText ? "rotate-180" : ""}`}>
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
               <path d="M6 9l6 6 6-6" />
             </svg>
-          </span>
+          </button>
           <div className="flex-1 border-t border-dashed" />
         </div>
       )}
