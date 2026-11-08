@@ -72,7 +72,7 @@ const MoveCard = ({ move }: Props) => {
       {/* gridの0fr〜1frで高さの変化を計算してアニメーションをつける */}
       {/* 改行と全角スペースをゼロ幅スペースにして、空白を見せずにbreak-keepで折り返す */}
       {move.flavorText !== null && (
-        <div className={`grid ${toggleFlavorText ? "grid-rows-[1fr]" : "grid-rows-[0fr]"} transition-[grid-template-rows] duration-200`}>
+        <div aria-hidden={!toggleFlavorText} className={`grid ${toggleFlavorText ? "grid-rows-[1fr]" : "grid-rows-[0fr]"} transition-[grid-template-rows] duration-200`}>
           <span className={`overflow-hidden text-sm leading-relaxed break-keep ${ACCENT_DATA_CLASSNAME}`}>{move.flavorText.replaceAll("\n", "\u200B").replaceAll("　", "\u200B")}</span>
         </div>
       )}
